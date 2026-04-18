@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RoyaltyOS · Auditor Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --a:#a038b2;--a2:#8a2fa0;--al:#f8f0fa;--am:#dba8e8;--a3:#f2e0f7;
+  --bg:#f2f1f5;--w:#fff;
+  --g50:#fafaf9;--g100:#f5f4f1;--g150:#edecea;--g200:#e4e2de;--g300:#ccc9c3;
+  --g400:#a8a49c;--g500:#78746c;--g600:#57534e;--g700:#3a3734;--g900:#1a1917;
+  --grn-bg:#edf7f2;--grn:#15643a;
+  --amb-bg:#fffaeb;--amb:#92400e;
+  --red-bg:#fef2f2;--red:#991b1b;
+  --blu-bg:#eff6ff;--blu:#1e3fa0;
+  --r12:12px;--r16:16px;--r20:20px;--r24:24px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 20px rgba(0,0,0,.09),0 1px 4px rgba(0,0,0,.04);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  font-size:14px;color:var(--g700);line-height:1.5;
+}
+body{background:var(--bg);min-height:100vh;display:flex;overflow-x:hidden}
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+.sb{width:214px;min-height:100vh;background:var(--w);border-right:1px solid var(--g200);
+  display:flex;flex-direction:column;padding:18px 10px 20px;flex-shrink:0;
+  position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:9px;padding:4px 8px;margin-bottom:26px}
+.bmark{width:28px;height:28px;border-radius:8px;background:var(--a);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bmark svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bname{font-size:14px;font-weight:800;color:var(--g900);letter-spacing:-.02em}
+.bsub{font-size:9px;color:var(--g400);text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
+.ng{font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;
+  letter-spacing:.07em;padding:0 10px;margin:14px 0 5px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--g500);border:none;background:none;
+  width:100%;text-align:left;transition:all .13s}
+.ni:hover{background:var(--g100);color:var(--g700)}
+.ni.active{background:var(--al);color:var(--a);font-weight:600}
+.ni svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.nbadge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+  background:var(--a);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.nbadge.a{background:#f59e0b}
+.sbf{margin-top:auto;padding-top:14px;border-top:1px solid var(--g150)}
+.urow{display:flex;align-items:center;gap:9px;padding:6px 8px}
+.av{width:28px;height:28px;border-radius:50%;background:var(--a);color:white;
+  font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.uname{font-size:12px;font-weight:600;color:var(--g900)}
+.urole{font-size:10px;color:var(--g400);margin-top:1px}
+
+/* ── Main ────────────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{background:rgba(255,255,255,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--g200);padding:0 26px;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:40;flex-shrink:0}
+.tbl{display:flex;align-items:center;gap:10px}
+.tbtitle{font-size:13.5px;font-weight:600;color:var(--g900)}
+.rbadge{padding:3px 9px;border-radius:999px;background:var(--al);color:var(--a);
+  font-size:10.5px;font-weight:700;border:1px solid var(--am)}
+.sw{display:flex;align-items:center;gap:7px;background:var(--g100);border-radius:9px;
+  padding:5px 11px;border:1px solid var(--g200);transition:all .15s}
+.sw:focus-within{background:white;border-color:var(--am);box-shadow:0 0 0 3px var(--a3)}
+.sw svg{width:13px;height:13px;stroke:var(--g400);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sw input{border:none;background:none;font-size:12px;color:var(--g700);outline:none;width:170px;font-family:inherit}
+.sw input::placeholder{color:var(--g400)}
+.tbr{display:flex;align-items:center;gap:8px}
+.ibtn{width:30px;height:30px;border-radius:8px;background:var(--g100);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--g500);transition:all .12s;position:relative}
+.ibtn:hover{background:var(--g200);color:var(--g700)}
+.ibtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pip::after{content:'';position:absolute;top:5px;right:5px;width:6px;height:6px;background:#ef4444;border-radius:50%;border:1.5px solid white}
+
+/* ── Content ─────────────────────────────────────────────────── */
+.cnt{padding:22px 26px 56px;max-width:1100px;width:100%}
+.page{display:none}.page.active{display:block}
+
+/* ── Hero ────────────────────────────────────────────────────── */
+.hero{border-radius:var(--r20);padding:22px 26px 20px;margin-bottom:22px;
+  position:relative;overflow:hidden;color:white;
+  background:linear-gradient(135deg,#a038b2 0%,#7b229c 48%,#571470 100%)}
+.hero::before{content:'';position:absolute;top:-44px;right:-44px;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero::after{content:'';position:absolute;bottom:-28px;right:110px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.05)}
+.hero-orb{position:absolute;right:-14px;bottom:-18px;width:96px;height:96px;border-radius:50%;background:rgba(255,255,255,.06)}
+.hi{position:relative;z-index:2}
+.hlbl{font-size:10.5px;font-weight:600;opacity:.6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.htitle{font-size:19px;font-weight:700;letter-spacing:-.02em;margin-bottom:5px;line-height:1.25}
+.hsub{font-size:12.5px;opacity:.72;line-height:1.6;max-width:520px}
+.hacts{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.hbtn{padding:7px 15px;border-radius:10px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .13s}
+.hbtn.p{background:white;color:#7b229c}.hbtn.p:hover{background:#f5f0ff}
+.hbtn.s{background:rgba(255,255,255,.15);color:white}.hbtn.s:hover{background:rgba(255,255,255,.22)}
+.hstats{display:flex;gap:24px;margin-top:18px;flex-wrap:wrap}
+.hsl{font-size:10px;opacity:.6;margin-bottom:2px;font-weight:500}
+.hsv{font-size:17px;font-weight:700;letter-spacing:-.01em}
+
+/* ── Section ─────────────────────────────────────────────────── */
+.sec{margin-bottom:26px}
+.shead{margin-bottom:13px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.stitle{font-size:13px;font-weight:700;color:var(--g900);letter-spacing:-.01em}
+.ssub{font-size:11.5px;color:var(--g400);margin-top:2px;line-height:1.5}
+.slink{font-size:12px;font-weight:600;color:var(--a);background:none;border:none;cursor:pointer;white-space:nowrap}
+
+/* ── Card ────────────────────────────────────────────────────── */
+.card{background:var(--w);border-radius:var(--r16);border:1px solid var(--g200);box-shadow:var(--sh)}
+.cb{padding:18px 20px}
+
+/* ── Stat grid ───────────────────────────────────────────────── */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.scard{background:var(--w);border-radius:var(--r16);border:1px solid var(--g200);padding:16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:9px}
+.sico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sico svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sval{font-size:22px;font-weight:700;color:var(--g900);letter-spacing:-.02em;line-height:1}
+.slbl{font-size:11.5px;font-weight:500;color:var(--g600);margin-top:4px}
+.shint{font-size:10.5px;color:var(--g400);margin-top:2px}
+.strend{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;margin-top:3px}
+.strend.up{color:#15803d}.strend.warn{color:#b45309}
+.strend svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Chip ────────────────────────────────────────────────────── */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;line-height:1.4}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.chip.grn{background:var(--grn-bg);color:var(--grn)}
+.chip.amb{background:var(--amb-bg);color:var(--amb)}
+.chip.red{background:var(--red-bg);color:var(--red)}
+.chip.pur{background:var(--al);color:var(--a)}
+.chip.blu{background:var(--blu-bg);color:var(--blu)}
+.chip.gry{background:var(--g100);color:var(--g600)}
+
+/* ── Button ──────────────────────────────────────────────────── */
+.btn{padding:7px 14px;border-radius:9px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:5px}
+.btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn.pr{background:var(--a);color:white}.btn.pr:hover{background:var(--a2)}
+.btn.se{background:var(--g100);color:var(--g600)}.btn.se:hover{background:var(--g200)}
+.btn.gh{background:var(--al);color:var(--a);border:1px solid var(--am)}.btn.gh:hover{background:var(--a3)}
+.btn.sm{padding:5px 11px;font-size:11px;border-radius:8px}
+.btn.full{width:100%;justify-content:center}
+.btn.flag-btn{background:var(--red-bg);color:var(--red)}.btn.flag-btn:hover{background:#fecaca}
+.btn.ok-btn{background:var(--grn-bg);color:var(--grn)}.btn.ok-btn:hover{background:#bbf7d0}
+
+/* ── Layout ──────────────────────────────────────────────────── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.tcol{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;align-items:start}
+
+/* ── Record cards ────────────────────────────────────────────── */
+.rec-list{display:flex;flex-direction:column;gap:10px}
+.rec-card{background:var(--w);border-radius:var(--r16);border:1px solid var(--g200);
+  padding:15px 18px;box-shadow:var(--sh);cursor:pointer;transition:all .15s;
+  border-left:3px solid transparent}
+.rec-card:hover{box-shadow:var(--sh2);transform:translateY(-1px)}
+.rec-card.selected{border-left-color:var(--a);background:#fdf9fe}
+.rec-card.flag{border-left-color:#f59e0b}
+.rec-card.ok{border-left-color:#22c55e}
+.rec-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}
+.rec-title{font-size:13px;font-weight:700;color:var(--g900);line-height:1.3}
+.rec-meta{font-size:11px;color:var(--g400);margin-top:2px}
+.rec-fields{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:10px}
+.rfl{font-size:10px;color:var(--g400);font-weight:500;margin-bottom:1px}
+.rfv{font-size:12px;font-weight:500;color:var(--g700)}
+.rec-acts{display:flex;gap:6px}
+
+/* ── Evidence trail ──────────────────────────────────────────── */
+.ev-trail{display:flex;align-items:flex-start;position:relative;padding:6px 0}
+.ev-line{position:absolute;top:19px;left:19px;right:19px;height:1px;background:var(--g200)}
+.ev-fill{position:absolute;top:19px;left:19px;height:1px;background:var(--a);transition:width .4s}
+.ev-step{display:flex;flex-direction:column;align-items:center;flex:1;z-index:1;padding:0 4px}
+.ev-dot{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--g200);background:white;margin-bottom:8px;flex-shrink:0}
+.ev-dot.done{background:#22c55e;border-color:#22c55e}
+.ev-dot.act{background:var(--a);border-color:var(--a)}
+.ev-dot svg{width:15px;height:15px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ev-dot.wait svg{stroke:var(--g300)}
+.ev-dot.wait{background:white;border-color:var(--g200)}
+.ev-lbl{font-size:11.5px;font-weight:600;color:var(--g900);text-align:center;line-height:1.3}
+.ev-sub{font-size:10.5px;color:var(--g400);text-align:center;margin-top:2px;line-height:1.4}
+.ev-date{font-size:10px;color:var(--g300);text-align:center;margin-top:2px}
+.ev-mobile{display:none}
+.evm-item{display:flex;gap:12px;padding-bottom:14px;position:relative}
+.evm-item:last-child{padding-bottom:0}
+.evm-col{display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0}
+.evm-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--g200);background:white;flex-shrink:0;z-index:1}
+.evm-dot.done{background:#22c55e;border-color:#22c55e}
+.evm-dot.act{background:var(--a);border-color:var(--a)}
+.evm-dot svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.evm-dot.wait svg{stroke:var(--g300)}
+.evm-line{flex:1;width:1px;background:var(--g200);margin-top:4px}
+.evm-body{flex:1;min-width:0;padding-top:3px}
+.evm-lbl{font-size:12.5px;font-weight:600;color:var(--g900)}
+.evm-sub{font-size:11px;color:var(--g500);margin-top:2px}
+
+/* ── Detail panel ────────────────────────────────────────────── */
+.detail-card{background:var(--w);border-radius:var(--r16);border:1px solid var(--g200);box-shadow:var(--sh);overflow:hidden}
+.detail-head{padding:16px 20px;border-bottom:1px solid var(--g150);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.detail-body{padding:18px 20px}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.kv{background:var(--g50);border-radius:9px;padding:10px 12px;border:1px solid var(--g100)}
+.kvk{font-size:10px;color:var(--g400);font-weight:500;margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.kvv{font-size:12.5px;font-weight:600;color:var(--g900)}
+.expand-btn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--a);background:none;border:none;cursor:pointer;padding:0;margin-top:4px}
+.expand-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.expand-btn.open svg{transform:rotate(90deg)}
+.tech-body{display:none;margin-top:10px;background:var(--g50);border-radius:10px;border:1px solid var(--g150);padding:12px}
+.tech-body.open{display:block}
+.mono{font-family:'SF Mono','Menlo',monospace;font-size:10.5px;color:var(--g500);word-break:break-all;line-height:1.6}
+
+/* ── Reconstruction check ────────────────────────────────────── */
+.recon-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.recon-side{border-radius:12px;padding:14px 16px;border:1px solid var(--g200)}
+.recon-side.expected{background:var(--blu-bg);border-color:#bfdbfe}
+.recon-side.observed{background:var(--grn-bg);border-color:#bbf7d0}
+.recon-side.mismatch{background:var(--red-bg);border-color:#fecaca}
+.recon-lbl{font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.recon-val{font-size:20px;font-weight:800;color:var(--g900);letter-spacing:-.02em;line-height:1}
+.recon-sub{font-size:11px;color:var(--g500);margin-top:3px}
+.recon-result{border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px}
+.recon-result.match{background:var(--grn-bg);border:1px solid #bbf7d0}
+.recon-result.mismatch{background:var(--red-bg);border:1px solid #fecaca}
+.recon-ico{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.recon-ico svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Flags ───────────────────────────────────────────────────── */
+.flag-list{display:flex;flex-direction:column;gap:10px}
+.flag-item{background:var(--w);border-radius:var(--r16);border:1px solid var(--g200);padding:14px 18px;box-shadow:var(--sh);display:flex;align-items:center;gap:14px;transition:all .15s}
+.flag-item:hover{box-shadow:var(--sh2)}
+.flag-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.flag-ico svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.flag-lbl{font-size:13px;font-weight:600;color:var(--g900)}
+.flag-desc{font-size:11.5px;color:var(--g500);margin-top:2px}
+.flag-date{font-size:10.5px;color:var(--g400);margin-top:2px}
+.flag-acts{display:flex;gap:6px;margin-left:auto;flex-shrink:0}
+
+/* ── Table ───────────────────────────────────────────────────── */
+.twrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--g150)}
+th{padding:10px 16px;text-align:left;font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+td{padding:12px 16px;font-size:12.5px;color:var(--g700);border-bottom:1px solid var(--g100);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--g50)}
+td.bold{font-weight:600;color:var(--g900)}
+td.muted{color:var(--g400);font-size:12px}
+.tlink{color:var(--a);font-weight:600;font-size:12px;background:none;border:none;cursor:pointer;padding:0}
+
+/* ── Mobile history cards ────────────────────────────────────── */
+.mhist{display:none}
+.mhc{background:var(--w);border-radius:var(--r16);border:1px solid var(--g200);padding:14px 16px;box-shadow:var(--sh);margin-bottom:10px}
+.mhc-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.mhc-title{font-size:13px;font-weight:700;color:var(--g900)}
+.mhc-date{font-size:11px;color:var(--g400);margin-top:2px}
+.mhc-row{display:flex;justify-content:space-between;margin-top:5px}
+.mhc-k{font-size:11px;color:var(--g400)}
+.mhc-v{font-size:12px;font-weight:600;color:var(--g900)}
+
+/* ── Activity feed ───────────────────────────────────────────── */
+.feed-item{display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--g100)}
+.feed-item:last-child{border-bottom:none}
+.fdot{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fdot svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ftext{flex:1;font-size:12.5px;color:var(--g700);line-height:1.45}
+.ftext strong{color:var(--g900);font-weight:600}
+.ftime{font-size:10.5px;color:var(--g400);white-space:nowrap}
+
+/* ── Progress bar ────────────────────────────────────────────── */
+.pbar{height:5px;border-radius:3px;background:var(--g150);overflow:hidden;margin-top:6px}
+.pfill{height:100%;border-radius:3px;background:var(--a)}
+
+/* ── Modal ───────────────────────────────────────────────────── */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.22);backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.moverlay.open{display:flex}
+@media(min-width:600px){.moverlay{align-items:center;padding:20px}}
+.modal{background:white;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;
+  border-radius:var(--r24) var(--r24) 0 0;box-shadow:0 24px 64px rgba(0,0,0,.16)}
+@media(min-width:600px){.modal{border-radius:var(--r24)}}
+.mhead{padding:18px 20px 14px;border-bottom:1px solid var(--g100);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:white;z-index:2;border-radius:var(--r24) var(--r24) 0 0}
+.mtitle{font-size:14px;font-weight:700;color:var(--g900)}
+.mclose{width:26px;height:26px;border-radius:8px;background:var(--g100);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g500)}
+.mclose svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.mbody{padding:16px 20px 22px}
+
+/* ── Tab strip ───────────────────────────────────────────────── */
+.tstrip{display:flex;gap:2px;background:var(--g100);border-radius:10px;padding:3px;width:fit-content;margin-bottom:16px}
+.tab{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;color:var(--g500);border:none;background:none;cursor:pointer;transition:all .13s}
+.tab.active{background:white;color:var(--g900);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* ── Bottom nav ──────────────────────────────────────────────── */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--g200);z-index:40;padding-bottom:env(safe-area-inset-bottom,0)}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 0 7px;background:none;border:none;cursor:pointer;color:var(--g400);font-size:10px;font-weight:500;gap:3px;transition:color .12s}
+.bni.active{color:var(--a)}
+.bni svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media(max-width:960px){.sgrid{grid-template-columns:repeat(2,1fr)}.tcol{grid-template-columns:1fr}}
+@media(max-width:768px){
+  .sb{display:none}.cnt{padding:14px 14px 80px}
+  .two{grid-template-columns:1fr}.tcol{grid-template-columns:1fr}
+  .bnav{display:flex}.topbar{padding:0 14px}.sw{display:none}
+  .recon-wrap{grid-template-columns:1fr 1fr}
+  .ev-trail{display:none}.ev-mobile{display:block}
+  .dtable{display:none}.mhist{display:block}
+  .kv-grid{grid-template-columns:1fr 1fr}
+  .sgrid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){.sgrid{grid-template-columns:1fr 1fr}.recon-wrap{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════════════════════ -->
+<aside class="sb">
+  <div class="brand">
+    <div class="bmark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <div><div class="bname">RoyaltyOS</div><div class="bsub">Auditor Portal</div></div>
+  </div>
+
+  <span class="ng">Workspace</span>
+  <button class="ni active" onclick="navTo('overview',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Overview
+  </button>
+  <button class="ni" onclick="navTo('evidence',this)">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Evidence
+    <span class="nbadge">3</span>
+  </button>
+  <button class="ni" onclick="navTo('review',this)">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Review
+    <span class="nbadge a">3</span>
+  </button>
+
+  <span class="ng">Account</span>
+  <button class="ni" onclick="navTo('settings',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Settings
+  </button>
+
+  <div class="sbf">
+    <div class="urow">
+      <div class="av">AV</div>
+      <div><div class="uname">Arini Veritas</div><div class="urole">Auditor / Verifier</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+<div class="main">
+  <header class="topbar">
+    <div class="tbl">
+      <div class="tbtitle" id="tb-title">Overview</div>
+      <span class="rbadge">Auditor / Verifier</span>
+    </div>
+    <div class="sw">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search records, works, creators…"/>
+    </div>
+    <div class="tbr">
+      <button class="ibtn pip">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <div class="av" style="cursor:pointer">AV</div>
+    </div>
+  </header>
+
+  <div class="cnt">
+
+    <!-- ══ PAGE: OVERVIEW ═══════════════════════════════════════════════════ -->
+    <div class="page active" id="page-overview">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hi">
+          <div class="hlbl">RoyaltyOS · Auditor Dashboard</div>
+          <div class="htitle">Review records with confidence</div>
+          <div class="hsub">Check payment evidence, compare expected and observed outcomes, and verify each step of the royalty flow.</div>
+          <div class="hacts">
+            <button class="hbtn p" onclick="navTo('evidence',document.querySelector('[onclick*=evidence]'))">Open Next Record</button>
+            <button class="hbtn s" onclick="navTo('review',document.querySelector('[onclick*=review]'))">View Audit History</button>
+          </div>
+          <div class="hstats">
+            <div><div class="hsl">Records Ready</div><div class="hsv">12</div></div>
+            <div><div class="hsl">Matched</div><div class="hsv">9</div></div>
+            <div><div class="hsl">Flagged</div><div class="hsv">3</div></div>
+          </div>
+        </div>
+        <div class="hero-orb"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="sec">
+        <div class="shead">
+          <div>
+            <div class="stitle">Audit Overview</div>
+            <div class="ssub">Review payment records, compare evidence, and verify whether the royalty flow can be trusted.</div>
+          </div>
+        </div>
+        <div class="sgrid">
+          <div class="scard">
+            <div class="sico" style="background:#f8f0fa;color:#a038b2">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+            </div>
+            <div><div class="sval">12</div><div class="slbl">Ready for Review</div><div class="shint">4 added this week</div></div>
+            <div class="strend warn"><svg viewBox="0 0 24 24"><polyline points="18 9 12 15 6 9"/></svg>3 high priority</div>
+          </div>
+          <div class="scard">
+            <div class="sico" style="background:#edf7f2;color:#15803d">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div><div class="sval">9</div><div class="slbl">Matched Records</div><div class="shint">Expected = Observed</div></div>
+            <div class="strend up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>75% match rate</div>
+          </div>
+          <div class="scard">
+            <div class="sico" style="background:#fffaeb;color:#92400e">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div><div class="sval">3</div><div class="slbl">Flagged Items</div><div class="shint">Need further attention</div></div>
+            <div class="strend warn"><svg viewBox="0 0 24 24"><polyline points="18 9 12 15 6 9"/></svg>2 mismatches</div>
+          </div>
+          <div class="scard">
+            <div class="sico" style="background:#eff6ff;color:#1e3fa0">
+              <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109 9"/><path d="M3 3v6h6"/><path d="M12 7v5l3 3"/></svg>
+            </div>
+            <div><div class="sval">28</div><div class="slbl">Recent Checks</div><div class="shint">Last 30 days</div></div>
+            <div class="strend up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>+4 this week</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two col: Records preview + Activity -->
+      <div class="two">
+        <div class="sec">
+          <div class="shead">
+            <div><div class="stitle">Records Waiting for Review</div><div class="ssub">Highest priority items first.</div></div>
+            <button class="slink" onclick="navTo('evidence',document.querySelector('[onclick*=evidence]'))">See all →</button>
+          </div>
+          <div class="rec-list">
+            <div class="rec-card flag" onclick="selectRecord(1,this)">
+              <div class="rec-top">
+                <div><div class="rec-title">Resonance Vol. 1</div><div class="rec-meta">Amara Wijaya · Apr 10, 2025</div></div>
+                <span class="chip amb">High Priority</span>
+              </div>
+              <div class="rec-fields">
+                <div><div class="rfl">Payment</div><div class="rfv">$842.00</div></div>
+                <div><div class="rfl">Proof</div><div class="rfv">Available</div></div>
+              </div>
+              <div class="rec-acts">
+                <button class="btn pr sm" onclick="navTo('evidence',document.querySelector('[onclick*=evidence]'));selectRecord(1,this)">Open Record</button>
+                <button class="btn se sm" onclick="openModal('modal-detail','Resonance Vol. 1')">Details</button>
+              </div>
+            </div>
+            <div class="rec-card flag" onclick="selectRecord(2,this)">
+              <div class="rec-top">
+                <div><div class="rec-title">Solar Frequencies</div><div class="rec-meta">Dewi Rahayu · Apr 8, 2025</div></div>
+                <span class="chip red">Mismatch</span>
+              </div>
+              <div class="rec-fields">
+                <div><div class="rfl">Expected</div><div class="rfv">$510.00</div></div>
+                <div><div class="rfl">Observed</div><div class="rfv">$480.00</div></div>
+              </div>
+              <div class="rec-acts">
+                <button class="btn pr sm" onclick="navTo('evidence',document.querySelector('[onclick*=evidence]'));selectRecord(2,this)">Open Record</button>
+                <button class="btn se sm" onclick="openModal('modal-detail','Solar Frequencies')">Details</button>
+              </div>
+            </div>
+            <div class="rec-card ok" onclick="selectRecord(3,this)">
+              <div class="rec-top">
+                <div><div class="rec-title">The Quiet Hours EP</div><div class="rec-meta">Amara Wijaya · Mar 15, 2025</div></div>
+                <span class="chip grn">Matched</span>
+              </div>
+              <div class="rec-fields">
+                <div><div class="rfl">Payment</div><div class="rfv">$214.50</div></div>
+                <div><div class="rfl">Proof</div><div class="rfv">Verified</div></div>
+              </div>
+              <div class="rec-acts">
+                <button class="btn se sm" onclick="openModal('modal-detail','The Quiet Hours EP')">Details</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity -->
+        <div class="sec">
+          <div class="shead">
+            <div><div class="stitle">Recent Activity</div><div class="ssub">Latest verification events.</div></div>
+          </div>
+          <div class="card">
+            <div class="feed-item">
+              <div class="fdot" style="background:#fef2f2;color:#991b1b"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              <div class="ftext"><strong>Mismatch flagged</strong> · Solar Frequencies — $30 shortfall</div>
+              <div class="ftime">Apr 11</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="ftext"><strong>Match confirmed</strong> · Resonance Vol. 1 proof verified</div>
+              <div class="ftime">Apr 10</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#eff6ff;color:#1e3fa0"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <div class="ftext"><strong>Proof checked</strong> · The Quiet Hours EP — all steps verified</div>
+              <div class="ftime">Apr 9</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#f8f0fa;color:#a038b2"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              <div class="ftext"><strong>New record ready</strong> · Night Market Series added to queue</div>
+              <div class="ftime">Apr 9</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+              <div class="ftext"><strong>Record reviewed</strong> · Coastal Frames — no issue found</div>
+              <div class="ftime">Apr 8</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#fffaeb;color:#92400e"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              <div class="ftext"><strong>Missing proof</strong> · Midnight Canopy — documentation incomplete</div>
+              <div class="ftime">Apr 7</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /overview -->
+
+
+    <!-- ══ PAGE: EVIDENCE ══════════════════════════════════════════════════ -->
+    <div class="page" id="page-evidence">
+
+      <!-- Records list + detail panel -->
+      <div class="tcol">
+
+        <!-- Left: Record list -->
+        <div>
+          <div class="sec">
+            <div class="shead">
+              <div><div class="stitle">Records Waiting for Review</div><div class="ssub">Click a record to inspect its evidence trail and payout comparison.</div></div>
+              <div class="tstrip">
+                <button class="tab active" onclick="filterRec('all',this)">All</button>
+                <button class="tab" onclick="filterRec('flag',this)">Flagged</button>
+                <button class="tab" onclick="filterRec('ok',this)">Matched</button>
+              </div>
+            </div>
+            <div class="rec-list" id="rec-list-main">
+              <div class="rec-card flag selected" data-rid="1" onclick="selectRecord(1,this)">
+                <div class="rec-top">
+                  <div><div class="rec-title">Resonance Vol. 1</div><div class="rec-meta">Amara Wijaya · Apr 10, 2025</div></div>
+                  <span class="chip amb">High Priority</span>
+                </div>
+                <div class="rec-fields">
+                  <div><div class="rfl">Usage</div><div class="rfv">7,200 streams</div></div>
+                  <div><div class="rfl">Expected</div><div class="rfv">$842.00</div></div>
+                  <div><div class="rfl">Observed</div><div class="rfv">$842.00</div></div>
+                  <div><div class="rfl">Proof</div><div class="rfv">Available</div></div>
+                </div>
+                <div class="rec-acts">
+                  <button class="btn pr sm" onclick="selectRecord(1,this.closest('.rec-card'))">Inspect</button>
+                  <button class="btn se sm" onclick="openModal('modal-detail','Resonance Vol. 1')">Details</button>
+                </div>
+              </div>
+              <div class="rec-card flag" data-rid="2" onclick="selectRecord(2,this)">
+                <div class="rec-top">
+                  <div><div class="rec-title">Solar Frequencies</div><div class="rec-meta">Dewi Rahayu · Apr 8, 2025</div></div>
+                  <span class="chip red">Mismatch</span>
+                </div>
+                <div class="rec-fields">
+                  <div><div class="rfl">Usage</div><div class="rfv">4,250 streams</div></div>
+                  <div><div class="rfl">Expected</div><div class="rfv">$510.00</div></div>
+                  <div><div class="rfl">Observed</div><div class="rfv">$480.00</div></div>
+                  <div><div class="rfl">Proof</div><div class="rfv">Partial</div></div>
+                </div>
+                <div class="rec-acts">
+                  <button class="btn pr sm" onclick="selectRecord(2,this.closest('.rec-card'))">Inspect</button>
+                  <button class="btn se sm" onclick="openModal('modal-detail','Solar Frequencies')">Details</button>
+                </div>
+              </div>
+              <div class="rec-card ok" data-rid="3" onclick="selectRecord(3,this)">
+                <div class="rec-top">
+                  <div><div class="rec-title">The Quiet Hours EP</div><div class="rec-meta">Amara Wijaya · Mar 15, 2025</div></div>
+                  <span class="chip grn">Matched</span>
+                </div>
+                <div class="rec-fields">
+                  <div><div class="rfl">Usage</div><div class="rfv">1,830 streams</div></div>
+                  <div><div class="rfl">Expected</div><div class="rfv">$214.50</div></div>
+                  <div><div class="rfl">Observed</div><div class="rfv">$214.50</div></div>
+                  <div><div class="rfl">Proof</div><div class="rfv">Verified</div></div>
+                </div>
+                <div class="rec-acts">
+                  <button class="btn se sm" onclick="selectRecord(3,this.closest('.rec-card'))">Inspect</button>
+                  <button class="btn se sm" onclick="openModal('modal-detail','The Quiet Hours EP')">Details</button>
+                </div>
+              </div>
+              <div class="rec-card flag" data-rid="4" onclick="selectRecord(4,this)">
+                <div class="rec-top">
+                  <div><div class="rec-title">Midnight Canopy</div><div class="rec-meta">Fajar Kurniawan · Apr 7, 2025</div></div>
+                  <span class="chip red">Missing Proof</span>
+                </div>
+                <div class="rec-fields">
+                  <div><div class="rfl">Usage</div><div class="rfv">2,100 streams</div></div>
+                  <div><div class="rfl">Expected</div><div class="rfv">$231.00</div></div>
+                  <div><div class="rfl">Observed</div><div class="rfv">—</div></div>
+                  <div><div class="rfl">Proof</div><div class="rfv">Missing</div></div>
+                </div>
+                <div class="rec-acts">
+                  <button class="btn pr sm" onclick="selectRecord(4,this.closest('.rec-card'))">Inspect</button>
+                  <button class="btn se sm" onclick="openModal('modal-detail','Midnight Canopy')">Details</button>
+                </div>
+              </div>
+              <div class="rec-card ok" data-rid="5" onclick="selectRecord(5,this)">
+                <div class="rec-top">
+                  <div><div class="rec-title">Night Market Series</div><div class="rec-meta">Budi Santoso · Apr 9, 2025</div></div>
+                  <span class="chip grn">Matched</span>
+                </div>
+                <div class="rec-fields">
+                  <div><div class="rfl">Usage</div><div class="rfv">3,200 views</div></div>
+                  <div><div class="rfl">Expected</div><div class="rfv">$288.00</div></div>
+                  <div><div class="rfl">Observed</div><div class="rfv">$288.00</div></div>
+                  <div><div class="rfl">Proof</div><div class="rfv">Verified</div></div>
+                </div>
+                <div class="rec-acts">
+                  <button class="btn se sm" onclick="selectRecord(5,this.closest('.rec-card'))">Inspect</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Detail + Reconstruction -->
+        <div id="detail-panel">
+          <!-- Record Detail -->
+          <div class="sec">
+            <div class="shead"><div><div class="stitle">Record Details</div><div class="ssub">Currently selected record.</div></div></div>
+            <div class="detail-card">
+              <div class="detail-head">
+                <div>
+                  <div style="font-size:13.5px;font-weight:700;color:var(--g900)" id="det-title">Resonance Vol. 1</div>
+                  <div style="font-size:11px;color:var(--g400);margin-top:2px" id="det-meta">Amara Wijaya · Apr 10, 2025</div>
+                </div>
+                <span id="det-chip" class="chip amb">High Priority</span>
+              </div>
+              <div class="detail-body">
+                <div class="kv-grid">
+                  <div class="kv"><div class="kvk">Work</div><div class="kvv" id="det-work">Resonance Vol. 1</div></div>
+                  <div class="kv"><div class="kvk">Creator</div><div class="kvv" id="det-creator">Amara Wijaya</div></div>
+                  <div class="kv"><div class="kvk">Usage Amount</div><div class="kvv" id="det-usage">7,200 streams</div></div>
+                  <div class="kv"><div class="kvk">Billing Period</div><div class="kvv" id="det-period">Apr 2025</div></div>
+                  <div class="kv"><div class="kvk">Expected Payment</div><div class="kvv" id="det-expected">$842.00</div></div>
+                  <div class="kv"><div class="kvk">Observed Payment</div><div class="kvv" id="det-observed">$842.00</div></div>
+                </div>
+                <div style="margin-bottom:12px">
+                  <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Verification Result</div>
+                  <div id="det-verdict" style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;background:#edf7f2;border:1px solid #bbf7d0">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span style="font-size:12.5px;font-weight:600;color:#15643a" id="det-verdict-text">Payment matches expected amount. All evidence present.</span>
+                  </div>
+                </div>
+                <button class="expand-btn" id="tech-toggle" onclick="toggleTech()">
+                  <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                  Technical Details
+                </button>
+                <div class="tech-body" id="tech-body">
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <div><div style="font-size:10px;color:var(--g400);font-weight:500;margin-bottom:2px">Token / Record ID</div><div class="mono" id="tech-token">REC-2025-001-RV1</div></div>
+                    <div><div style="font-size:10px;color:var(--g400);font-weight:500;margin-bottom:2px">Transaction Reference</div><div class="mono" id="tech-tx">0x1bc4e2d9…290c</div></div>
+                    <div><div style="font-size:10px;color:var(--g400);font-weight:500;margin-bottom:2px">Metadata Reference</div><div class="mono" id="tech-meta">meta_id: MT-AW-001-APR25</div></div>
+                    <div><div style="font-size:10px;color:var(--g400);font-weight:500;margin-bottom:2px">Ledger Record</div><div class="mono">Distributed ledger · Immutable · Stored Apr 10</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reconstruction Check -->
+          <div class="sec">
+            <div class="shead"><div><div class="stitle">Reconstruction Check</div><div class="ssub">Does the observed payout match what was expected?</div></div></div>
+            <div class="card cb">
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+                <div class="kv"><div class="kvk">Rate per Unit</div><div class="kvv" id="rc-rate">$0.117</div></div>
+                <div class="kv"><div class="kvk">Units Submitted</div><div class="kvv" id="rc-units">7,200</div></div>
+                <div class="kv"><div class="kvk">Rule Applied</div><div class="kvv">12% net</div></div>
+              </div>
+              <div class="recon-wrap">
+                <div class="recon-side expected">
+                  <div class="recon-lbl">Expected Payout</div>
+                  <div class="recon-val" id="rc-expected">$842.00</div>
+                  <div class="recon-sub">Based on rule × usage</div>
+                </div>
+                <div class="recon-side observed" id="rc-observed-card">
+                  <div class="recon-lbl">Observed Payout</div>
+                  <div class="recon-val" id="rc-observed">$842.00</div>
+                  <div class="recon-sub">Actual amount disbursed</div>
+                </div>
+              </div>
+              <div class="recon-result match" id="rc-result">
+                <div class="recon-ico" style="background:#dcfce7;color:#15803d" id="rc-ico">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--g900)" id="rc-verdict">Match Confirmed</div>
+                  <div style="font-size:11.5px;color:var(--g500);margin-top:1px" id="rc-sub">Expected and observed amounts are identical.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evidence Trail -->
+          <div class="sec">
+            <div class="shead"><div><div class="stitle">Evidence Trail</div><div class="ssub">Step-by-step record of the royalty flow for this record.</div></div></div>
+            <div class="card cb">
+              <div class="ev-trail">
+                <div class="ev-line"></div>
+                <div class="ev-fill" id="ev-fill" style="width:calc(75% - 12px)"></div>
+                <div class="ev-step">
+                  <div class="ev-dot done" id="ev1"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <div class="ev-lbl">Rule Approved</div>
+                  <div class="ev-sub">Royalty rule confirmed</div>
+                  <div class="ev-date" id="ev1-date">Jan 15</div>
+                </div>
+                <div class="ev-step">
+                  <div class="ev-dot done" id="ev2"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <div class="ev-lbl">Usage Recorded</div>
+                  <div class="ev-sub">Streams submitted</div>
+                  <div class="ev-date" id="ev2-date">Apr 1</div>
+                </div>
+                <div class="ev-step">
+                  <div class="ev-dot done" id="ev3"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                  <div class="ev-lbl">Payment Completed</div>
+                  <div class="ev-sub">Funds disbursed</div>
+                  <div class="ev-date" id="ev3-date">Apr 10</div>
+                </div>
+                <div class="ev-step">
+                  <div class="ev-dot done" id="ev4"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                  <div class="ev-lbl">Proof Stored</div>
+                  <div class="ev-sub">Immutable record saved</div>
+                  <div class="ev-date" id="ev4-date">Apr 10</div>
+                </div>
+              </div>
+              <!-- Mobile evidence -->
+              <div class="ev-mobile" id="ev-mobile">
+                <div class="evm-item"><div class="evm-col"><div class="evm-dot done" id="evm1"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="evm-line"></div></div><div class="evm-body"><div class="evm-lbl">Rule Approved</div><div class="evm-sub">Royalty rule confirmed · Jan 15</div></div></div>
+                <div class="evm-item"><div class="evm-col"><div class="evm-dot done" id="evm2"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="evm-line"></div></div><div class="evm-body"><div class="evm-lbl">Usage Recorded</div><div class="evm-sub">Streams submitted · Apr 1</div></div></div>
+                <div class="evm-item"><div class="evm-col"><div class="evm-dot done" id="evm3"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="evm-line"></div></div><div class="evm-body"><div class="evm-lbl">Payment Completed</div><div class="evm-sub">Funds disbursed · Apr 10</div></div></div>
+                <div class="evm-item"><div class="evm-col"><div class="evm-dot done" id="evm4"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div><div class="evm-body"><div class="evm-lbl">Proof Stored</div><div class="evm-sub">Immutable record saved · Apr 10</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tcol -->
+    </div><!-- /evidence -->
+
+
+    <!-- ══ PAGE: REVIEW ════════════════════════════════════════════════════ -->
+    <div class="page" id="page-review">
+
+      <!-- Flags and Exceptions -->
+      <div class="sec">
+        <div class="shead">
+          <div><div class="stitle">Flags and Exceptions</div><div class="ssub">Items that need further attention. Review each one carefully before closing.</div></div>
+          <div class="tstrip">
+            <button class="tab active" onclick="filterFlags('all',this)">All</button>
+            <button class="tab" onclick="filterFlags('mismatch',this)">Mismatch</button>
+            <button class="tab" onclick="filterFlags('missing',this)">Missing Proof</button>
+            <button class="tab" onclick="filterFlags('ok',this)">No Issue</button>
+          </div>
+        </div>
+        <div class="flag-list" id="flag-list">
+
+          <div class="flag-item" data-ftype="mismatch">
+            <div class="flag-ico" style="background:#fef2f2;color:#991b1b"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="flag-lbl">Solar Frequencies — Mismatch Detected</div>
+              <div class="flag-desc">Observed payout ($480.00) is $30 below the expected amount ($510.00). Review usage and rate calculation.</div>
+              <div class="flag-date">Flagged Apr 11, 2025</div>
+            </div>
+            <span class="chip red">Mismatch</span>
+            <div class="flag-acts">
+              <button class="btn flag-btn sm" onclick="openModal('modal-flagdetail','Solar Frequencies')">Flag Record</button>
+              <button class="btn se sm" onclick="openModal('modal-flagdetail','Solar Frequencies')">Open Details</button>
+            </div>
+          </div>
+
+          <div class="flag-item" data-ftype="missing">
+            <div class="flag-ico" style="background:#fffaeb;color:#92400e"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="flag-lbl">Midnight Canopy — Missing Proof</div>
+              <div class="flag-desc">Usage was submitted but no proof record was stored. Payment cannot be fully verified without supporting documentation.</div>
+              <div class="flag-date">Flagged Apr 7, 2025</div>
+            </div>
+            <span class="chip amb">Missing Proof</span>
+            <div class="flag-acts">
+              <button class="btn flag-btn sm" onclick="openModal('modal-flagdetail','Midnight Canopy')">Flag Record</button>
+              <button class="btn se sm" onclick="openModal('modal-flagdetail','Midnight Canopy')">Open Details</button>
+            </div>
+          </div>
+
+          <div class="flag-item" data-ftype="mismatch">
+            <div class="flag-ico" style="background:#fffaeb;color:#92400e"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="flag-lbl">Urban Drift Photography — Needs Review</div>
+              <div class="flag-desc">Royalty rule rate (15%) was recently amended. Verify whether the observed payment reflects the updated or original rate.</div>
+              <div class="flag-date">Flagged Apr 8, 2025</div>
+            </div>
+            <span class="chip amb">Needs Review</span>
+            <div class="flag-acts">
+              <button class="btn ok-btn sm" onclick="alert('Record marked as reviewed.')">Mark Reviewed</button>
+              <button class="btn se sm" onclick="openModal('modal-flagdetail','Urban Drift Photography')">Open Details</button>
+            </div>
+          </div>
+
+          <div class="flag-item" data-ftype="ok">
+            <div class="flag-ico" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="flag-lbl">Coastal Frames — No Issue Found</div>
+              <div class="flag-desc">All records match. Proof stored. Payment confirmed. No further action required.</div>
+              <div class="flag-date">Reviewed Apr 8, 2025</div>
+            </div>
+            <span class="chip grn">No Issue</span>
+            <div class="flag-acts">
+              <button class="btn se sm" onclick="openModal('modal-flagdetail','Coastal Frames')">View Record</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Audit History -->
+      <div class="sec">
+        <div class="shead">
+          <div><div class="stitle">Audit History</div><div class="ssub">Previously reviewed records and their outcomes.</div></div>
+        </div>
+
+        <!-- Desktop table -->
+        <div class="card dtable">
+          <div class="twrap">
+            <table>
+              <thead>
+                <tr><th>Date</th><th>Work</th><th>Creator</th><th>Result</th><th>Flag Status</th><th>Notes</th><th></th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="muted">Apr 10</td><td class="bold">Resonance Vol. 1</td><td>Amara Wijaya</td><td><span class="chip grn">Matched</span></td><td><span class="chip grn">No Issue</span></td><td class="muted">All steps verified</td><td><button class="tlink" onclick="openModal('modal-detail','Resonance Vol. 1')">View</button></td></tr>
+                <tr><td class="muted">Apr 9</td><td class="bold">The Quiet Hours EP</td><td>Amara Wijaya</td><td><span class="chip grn">Matched</span></td><td><span class="chip grn">No Issue</span></td><td class="muted">Proof confirmed</td><td><button class="tlink" onclick="openModal('modal-detail','The Quiet Hours EP')">View</button></td></tr>
+                <tr><td class="muted">Apr 8</td><td class="bold">Coastal Frames</td><td>Sari Nuraini</td><td><span class="chip grn">Matched</span></td><td><span class="chip grn">No Issue</span></td><td class="muted">$336.80 verified</td><td><button class="tlink" onclick="openModal('modal-detail','Coastal Frames')">View</button></td></tr>
+                <tr><td class="muted">Apr 8</td><td class="bold">Urban Drift Photography</td><td>Sari Nuraini</td><td><span class="chip amb">Under Review</span></td><td><span class="chip amb">Needs Review</span></td><td class="muted">Rate amendment query</td><td><button class="tlink" onclick="openModal('modal-detail','Urban Drift Photography')">View</button></td></tr>
+                <tr><td class="muted">Apr 7</td><td class="bold">Midnight Canopy</td><td>Fajar Kurniawan</td><td><span class="chip red">Unverified</span></td><td><span class="chip red">Missing Proof</span></td><td class="muted">Incomplete documentation</td><td><button class="tlink" onclick="openModal('modal-detail','Midnight Canopy')">View</button></td></tr>
+                <tr><td class="muted">Mar 31</td><td class="bold">Night Market Series</td><td>Budi Santoso</td><td><span class="chip grn">Matched</span></td><td><span class="chip grn">No Issue</span></td><td class="muted">$288.00 confirmed</td><td><button class="tlink" onclick="openModal('modal-detail','Night Market Series')">View</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Mobile cards -->
+        <div class="mhist">
+          <div class="mhc">
+            <div class="mhc-hd"><div><div class="mhc-title">Resonance Vol. 1</div><div class="mhc-date">Apr 10, 2025</div></div><span class="chip grn">Matched</span></div>
+            <div class="mhc-row"><span class="mhc-k">Creator</span><span class="mhc-v">Amara Wijaya</span></div>
+            <div class="mhc-row"><span class="mhc-k">Flag</span><span class="mhc-v">No Issue</span></div>
+            <div style="margin-top:10px"><button class="btn gh sm full" onclick="openModal('modal-detail','Resonance Vol. 1')">View Record</button></div>
+          </div>
+          <div class="mhc">
+            <div class="mhc-hd"><div><div class="mhc-title">Solar Frequencies</div><div class="mhc-date">Apr 8, 2025</div></div><span class="chip red">Mismatch</span></div>
+            <div class="mhc-row"><span class="mhc-k">Creator</span><span class="mhc-v">Dewi Rahayu</span></div>
+            <div class="mhc-row"><span class="mhc-k">Flag</span><span class="mhc-v">Mismatch Detected</span></div>
+            <div style="margin-top:10px"><button class="btn gh sm full" onclick="openModal('modal-detail','Solar Frequencies')">View Record</button></div>
+          </div>
+          <div class="mhc">
+            <div class="mhc-hd"><div><div class="mhc-title">Midnight Canopy</div><div class="mhc-date">Apr 7, 2025</div></div><span class="chip red">Unverified</span></div>
+            <div class="mhc-row"><span class="mhc-k">Creator</span><span class="mhc-v">Fajar Kurniawan</span></div>
+            <div class="mhc-row"><span class="mhc-k">Flag</span><span class="mhc-v">Missing Proof</span></div>
+            <div style="margin-top:10px"><button class="btn gh sm full" onclick="openModal('modal-detail','Midnight Canopy')">View Record</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /review -->
+
+
+    <!-- ══ PAGE: SETTINGS ══════════════════════════════════════════════════ -->
+    <div class="page" id="page-settings">
+      <div class="sec">
+        <div class="shead"><div><div class="stitle">Settings</div><div class="ssub">Auditor account preferences.</div></div></div>
+        <div class="card cb" style="max-width:520px">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div><label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Full Name</label><input style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none" value="Arini Veritas"/></div>
+            <div><label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Role</label><input style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g100);font-size:13px;color:var(--g500);font-family:inherit;outline:none" value="Auditor / Verifier" readonly/></div>
+            <div><label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Email</label><input style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none" value="a.veritas@RoyaltyOSio"/></div>
+            <div><label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Alert Preference</label>
+              <select style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none;appearance:none"><option>Email + In-app</option><option>Email only</option><option>In-app only</option></select>
+            </div>
+            <button class="btn pr" onclick="alert('Settings saved.')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /cnt -->
+</div><!-- /main -->
+
+<!-- Bottom nav -->
+<nav class="bnav">
+  <button class="bni active" onclick="navTo('overview',this,true)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Overview
+  </button>
+  <button class="bni" onclick="navTo('evidence',this,true)">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Evidence
+  </button>
+  <button class="bni" onclick="navTo('review',this,true)">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Review
+  </button>
+  <button class="bni" onclick="navTo('settings',this,true)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+
+<!-- ═══ MODALS ══════════════════════════════════════════════════════════════ -->
+
+<!-- Record detail modal -->
+<div class="moverlay" id="modal-detail">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle" id="modal-detail-title">Record Details</div>
+      <button class="mclose" onclick="closeModal('modal-detail')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="kv-grid">
+        <div class="kv"><div class="kvk">Work</div><div class="kvv" id="md-work">Resonance Vol. 1</div></div>
+        <div class="kv"><div class="kvk">Creator</div><div class="kvv">Amara Wijaya</div></div>
+        <div class="kv"><div class="kvk">Usage</div><div class="kvv">7,200 streams</div></div>
+        <div class="kv"><div class="kvk">Period</div><div class="kvv">Apr 2025</div></div>
+        <div class="kv"><div class="kvk">Expected</div><div class="kvv">$842.00</div></div>
+        <div class="kv"><div class="kvk">Observed</div><div class="kvv">$842.00</div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Verification Result</div>
+        <div style="padding:9px 12px;border-radius:10px;background:#edf7f2;border:1px solid #bbf7d0;font-size:12.5px;font-weight:600;color:#15643a">
+          Payment matches expected amount. All evidence present.
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Technical Reference</div>
+        <div style="background:var(--g50);border-radius:8px;padding:10px 12px;font-family:'SF Mono','Menlo',monospace;font-size:10.5px;color:var(--g500);word-break:break-all;border:1px solid var(--g150);line-height:1.6">
+          record_id: REC-2025-001-RV1 · tx: 0x1bc4e2d9…290c<br>meta_id: MT-AW-001-APR25 · Ledger: Immutable
+        </div>
+      </div>
+      <button class="btn se full" onclick="closeModal('modal-detail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Flag detail modal -->
+<div class="moverlay" id="modal-flagdetail">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle" id="modal-flagdetail-title">Flag Details</div>
+      <button class="mclose" onclick="closeModal('modal-flagdetail')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="kv-grid">
+        <div class="kv"><div class="kvk">Flag Type</div><div class="kvv" style="color:#991b1b">Mismatch Detected</div></div>
+        <div class="kv"><div class="kvk">Date Flagged</div><div class="kvv">Apr 11, 2025</div></div>
+        <div class="kv"><div class="kvk">Expected</div><div class="kvv">$510.00</div></div>
+        <div class="kv"><div class="kvk">Observed</div><div class="kvv" style="color:#991b1b">$480.00</div></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Auditor Notes</div>
+        <textarea style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none;resize:vertical;min-height:72px" placeholder="Add your findings or notes here…"></textarea>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn flag-btn full" onclick="alert('Record flagged for follow-up.');closeModal('modal-flagdetail')">Confirm Flag</button>
+        <button class="btn ok-btn full" onclick="alert('Record marked as reviewed.');closeModal('modal-flagdetail')">Mark Reviewed</button>
+      </div>
+      <button class="btn se full" style="margin-top:8px" onclick="closeModal('modal-flagdetail')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ── Mock record data ──────────────────────────────────────────────────── */
+const RECORDS = {
+  1:{title:'Resonance Vol. 1',creator:'Amara Wijaya',date:'Apr 10, 2025',period:'Apr 2025',
+     usage:'7,200 streams',expected:'$842.00',observed:'$842.00',
+     chipClass:'chip amb',chipText:'High Priority',
+     match:true,rate:'$0.117',units:'7,200',
+     token:'REC-2025-001-RV1',tx:'0x1bc4e2d9…290c',meta:'meta_id: MT-AW-001-APR25',
+     ev:[true,true,true,true],evDates:['Jan 15','Apr 1','Apr 10','Apr 10'],
+     evFill:'calc(100% - 12px)'},
+  2:{title:'Solar Frequencies',creator:'Dewi Rahayu',date:'Apr 8, 2025',period:'Apr 2025',
+     usage:'4,250 streams',expected:'$510.00',observed:'$480.00',
+     chipClass:'chip red',chipText:'Mismatch',
+     match:false,rate:'$0.120',units:'4,250',
+     token:'REC-2025-002-SF',tx:'0x9a3c1f7e…44bd',meta:'meta_id: MT-DR-002-APR25',
+     ev:[true,true,true,false],evDates:['Mar 5','Apr 3','Apr 8',null],
+     evFill:'calc(58% - 12px)'},
+  3:{title:'The Quiet Hours EP',creator:'Amara Wijaya',date:'Mar 15, 2025',period:'Mar 2025',
+     usage:'1,830 streams',expected:'$214.50',observed:'$214.50',
+     chipClass:'chip grn',chipText:'Matched',
+     match:true,rate:'$0.117',units:'1,830',
+     token:'REC-2025-003-QHE',tx:'0x8f3b1c7d…a45e',meta:'meta_id: MT-AW-003-MAR25',
+     ev:[true,true,true,true],evDates:['Mar 5','Mar 10','Mar 15','Mar 15'],
+     evFill:'calc(100% - 12px)'},
+  4:{title:'Midnight Canopy',creator:'Fajar Kurniawan',date:'Apr 7, 2025',period:'Apr 2025',
+     usage:'2,100 streams',expected:'$231.00',observed:'—',
+     chipClass:'chip red',chipText:'Missing Proof',
+     match:false,rate:'$0.110',units:'2,100',
+     token:'REC-2025-004-MC',tx:'—',meta:'—',
+     ev:[true,true,false,false],evDates:['Feb 20','Apr 5',null,null],
+     evFill:'calc(33% - 12px)'},
+  5:{title:'Night Market Series',creator:'Budi Santoso',date:'Apr 9, 2025',period:'Apr 2025',
+     usage:'3,200 views',expected:'$288.00',observed:'$288.00',
+     chipClass:'chip grn',chipText:'Matched',
+     match:true,rate:'$0.090',units:'3,200',
+     token:'REC-2025-005-NMS',tx:'0x2de5f8a1…b33c',meta:'meta_id: MT-BS-005-APR25',
+     ev:[true,true,true,true],evDates:['Apr 9','Apr 9','Apr 9','Apr 9'],
+     evFill:'calc(100% - 12px)'}
+};
+
+/* ── Navigation ────────────────────────────────────────────────────────── */
+const titles = {overview:'Overview',evidence:'Evidence',review:'Review',settings:'Settings'};
+function navTo(id, el, mobile) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('tb-title').textContent = titles[id]||id;
+  if(mobile){document.querySelectorAll('.bni').forEach(n=>n.classList.remove('active'));}
+  else{document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));}
+  if(el)el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── Select record ─────────────────────────────────────────────────────── */
+function selectRecord(id, el) {
+  document.querySelectorAll('.rec-card').forEach(c=>c.classList.remove('selected'));
+  if(el&&el.classList)el.classList.add('selected');
+  const r = RECORDS[id]; if(!r) return;
+
+  // Detail panel
+  document.getElementById('det-title').textContent = r.title;
+  document.getElementById('det-meta').textContent = r.creator+' · '+r.date;
+  document.getElementById('det-work').textContent = r.title;
+  document.getElementById('det-creator').textContent = r.creator;
+  document.getElementById('det-usage').textContent = r.usage;
+  document.getElementById('det-period').textContent = r.period;
+  document.getElementById('det-expected').textContent = r.expected;
+  document.getElementById('det-observed').textContent = r.observed;
+  const chip = document.getElementById('det-chip');
+  chip.className = r.chipClass; chip.textContent = r.chipText;
+  const verdict = document.getElementById('det-verdict');
+  const vtext = document.getElementById('det-verdict-text');
+  if(r.match){
+    verdict.style.background='#edf7f2';verdict.style.borderColor='#bbf7d0';
+    vtext.style.color='#15643a';
+    vtext.textContent='Payment matches expected amount. All evidence present.';
+    verdict.querySelector('svg').setAttribute('stroke','#15803d');
+    verdict.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span id="det-verdict-text" style="font-size:12.5px;font-weight:600;color:#15643a">Payment matches expected amount. All evidence present.</span>';
+  } else {
+    verdict.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg><span style="font-size:12.5px;font-weight:600;color:#991b1b">Discrepancy detected. Review usage data and rule calculation.</span>';
+    verdict.style.background='#fef2f2';verdict.style.borderColor='#fecaca';
+  }
+  document.getElementById('tech-token').textContent = r.token;
+  document.getElementById('tech-tx').textContent = r.tx;
+  document.getElementById('tech-meta').textContent = r.meta;
+
+  // Reconstruction
+  document.getElementById('rc-rate').textContent = r.rate;
+  document.getElementById('rc-units').textContent = r.units;
+  document.getElementById('rc-expected').textContent = r.expected;
+  document.getElementById('rc-observed').textContent = r.observed;
+  const obsCard = document.getElementById('rc-observed-card');
+  if(r.match){
+    obsCard.className='recon-side observed';
+    document.getElementById('rc-result').className='recon-result match';
+    document.getElementById('rc-ico').style.cssText='background:#dcfce7;color:#15803d;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+    document.getElementById('rc-ico').innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    document.getElementById('rc-verdict').textContent='Match Confirmed';
+    document.getElementById('rc-sub').textContent='Expected and observed amounts are identical.';
+  } else {
+    obsCard.className='recon-side mismatch';
+    document.getElementById('rc-result').className='recon-result mismatch';
+    document.getElementById('rc-ico').style.cssText='background:#fee2e2;color:#991b1b;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+    document.getElementById('rc-ico').innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>';
+    document.getElementById('rc-verdict').textContent='Mismatch Detected';
+    document.getElementById('rc-sub').textContent='Observed amount does not match expected. Further review required.';
+  }
+
+  // Evidence trail
+  document.getElementById('ev-fill').style.width = r.evFill;
+  r.ev.forEach((done,i)=>{
+    const dot = document.getElementById('ev'+(i+1));
+    dot.className = 'ev-dot '+(done?'done':'wait');
+    dot.innerHTML = done
+      ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+      : '<svg viewBox="0 0 24 24" style="stroke:var(--g300)"><circle cx="12" cy="12" r="4"/></svg>';
+    const dateEl = document.getElementById('ev'+(i+1)+'-date');
+    if(dateEl) dateEl.textContent = r.evDates[i]||'—';
+    const evm = document.getElementById('evm'+(i+1));
+    if(evm){ evm.className='evm-dot '+(done?'done':'wait');
+      evm.innerHTML=done?'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':'<svg viewBox="0 0 24 24" style="stroke:var(--g300)"><circle cx="12" cy="12" r="4"/></svg>'; }
+  });
+}
+
+/* ── Tech toggle ───────────────────────────────────────────────────────── */
+function toggleTech(){
+  const btn=document.getElementById('tech-toggle');
+  const body=document.getElementById('tech-body');
+  btn.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+/* ── Modals ────────────────────────────────────────────────────────────── */
+function openModal(id, label) {
+  const el=document.getElementById(id);
+  const t=document.getElementById(id+'-title');
+  if(t&&label)t.textContent=label;
+  el.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow='';
+}
+document.querySelectorAll('.moverlay').forEach(o=>{
+  o.addEventListener('click',function(e){if(e.target===this){this.classList.remove('open');document.body.style.overflow='';}});
+});
+
+/* ── Filters ───────────────────────────────────────────────────────────── */
+function filterRec(type,btn){
+  document.querySelectorAll('.tstrip .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#rec-list-main .rec-card').forEach(c=>{
+    if(type==='all'){c.style.display='';return;}
+    c.style.display=c.classList.contains(type)?'':'none';
+  });
+}
+function filterFlags(type,btn){
+  document.querySelectorAll('.tstrip .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#flag-list .flag-item').forEach(c=>{
+    if(type==='all'){c.style.display='';return;}
+    c.style.display=c.dataset.ftype===type?'':'none';
+  });
+}
+</script>
+</body>
+</html>

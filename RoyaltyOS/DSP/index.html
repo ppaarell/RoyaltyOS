@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RoyaltyOS · DSP / Reporter Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --a:#a038b2;--a2:#8a2fa0;--al:#f8f0fa;--am:#dba8e8;--a3:#f2e0f7;
+  --bg:#f3f2f6;--white:#ffffff;
+  --g50:#fafaf9;--g100:#f5f4f1;--g150:#edecea;--g200:#e4e2de;--g300:#ccc9c3;
+  --g400:#a8a49c;--g500:#78746c;--g600:#57534e;--g700:#3a3734;--g900:#1a1917;
+  --green-bg:#edf7f2;--green:#15643a;
+  --amber-bg:#fffaeb;--amber:#92400e;
+  --red-bg:#fef2f2;--red:#991b1b;
+  --blue-bg:#eff6ff;--blue:#1e3fa0;
+  --r10:10px;--r12:12px;--r16:16px;--r20:20px;--r24:24px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 20px rgba(0,0,0,.09),0 1px 4px rgba(0,0,0,.04);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  font-size:14px;color:var(--g700);line-height:1.5;
+}
+body{background:var(--bg);min-height:100vh;display:flex;overflow-x:hidden}
+
+/* ── Sidebar ───────────────────────────────────────────────────────────── */
+.sidebar{width:216px;min-height:100vh;background:var(--white);border-right:1px solid var(--g200);
+  display:flex;flex-direction:column;padding:18px 10px 20px;flex-shrink:0;
+  position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:9px;padding:4px 8px;margin-bottom:26px}
+.brand-mark{width:28px;height:28px;border-radius:8px;background:var(--a);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-mark svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round}
+.brand-name{font-size:14px;font-weight:800;color:var(--g900);letter-spacing:-.02em}
+.brand-sub{font-size:9px;color:var(--g400);text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
+.nav-group-label{font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;
+  letter-spacing:.07em;padding:0 10px;margin:14px 0 5px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;
+  cursor:pointer;font-size:13px;font-weight:500;color:var(--g500);border:none;
+  background:none;width:100%;text-align:left;transition:all .13s}
+.nav-item:hover{background:var(--g100);color:var(--g700)}
+.nav-item.active{background:var(--al);color:var(--a);font-weight:600}
+.nav-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.nav-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+  background:var(--a);color:white;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center}
+.sidebar-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--g150)}
+.user-row{display:flex;align-items:center;gap:9px;padding:6px 8px}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--a);color:white;
+  font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;color:var(--g900)}
+.user-role{font-size:10px;color:var(--g400);margin-top:1px}
+
+/* ── Main ─────────────────────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* ── Top header ───────────────────────────────────────────────────────── */
+.topbar{background:rgba(255,255,255,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--g200);padding:0 26px;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:40;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-title{font-size:13.5px;font-weight:600;color:var(--g900)}
+.role-badge{padding:3px 9px;border-radius:999px;background:var(--al);color:var(--a);
+  font-size:10.5px;font-weight:700;letter-spacing:.01em;border:1px solid var(--am)}
+.search-wrap{display:flex;align-items:center;gap:7px;background:var(--g100);
+  border-radius:9px;padding:5px 11px;border:1px solid var(--g200);transition:all .15s}
+.search-wrap:focus-within{background:white;border-color:var(--am);box-shadow:0 0 0 3px var(--a3)}
+.search-wrap svg{width:13px;height:13px;stroke:var(--g400);fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.search-wrap input{border:none;background:none;font-size:12px;color:var(--g700);
+  outline:none;width:180px}
+.search-wrap input::placeholder{color:var(--g400)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.icon-btn{width:30px;height:30px;border-radius:8px;background:var(--g100);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--g500);transition:all .12s;position:relative}
+.icon-btn:hover{background:var(--g200);color:var(--g700)}
+.icon-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.notif-pip::after{content:'';position:absolute;top:5px;right:5px;width:6px;height:6px;
+  background:#ef4444;border-radius:50%;border:1.5px solid white}
+
+/* ── Content ──────────────────────────────────────────────────────────── */
+.content{padding:22px 26px 56px;max-width:1100px;width:100%}
+.page{display:none}.page.active{display:block}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+.hero{border-radius:var(--r20);padding:22px 24px 20px;margin-bottom:22px;
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#a038b2 0%,#7c259a 50%,#5a1470 100%);color:white}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;
+  border-radius:50%;background:rgba(255,255,255,.07)}
+.hero::after{content:'';position:absolute;bottom:-24px;right:100px;width:120px;height:120px;
+  border-radius:50%;background:rgba(255,255,255,.05)}
+.hero-orb{position:absolute;right:-12px;bottom:-16px;width:90px;height:90px;
+  border-radius:50%;background:rgba(255,255,255,.06)}
+.hero-inner{position:relative;z-index:2}
+.hero-label{font-size:10.5px;font-weight:600;opacity:.6;text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:6px}
+.hero-title{font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:5px;line-height:1.25}
+.hero-sub{font-size:12.5px;opacity:.72;line-height:1.6;max-width:500px}
+.hero-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.hero-btn{padding:7px 15px;border-radius:10px;font-size:12px;font-weight:600;
+  border:none;cursor:pointer;transition:all .13s}
+.hero-btn.primary{background:white;color:#7c259a}
+.hero-btn.primary:hover{background:#f5f0ff}
+.hero-btn.secondary{background:rgba(255,255,255,.15);color:white}
+.hero-btn.secondary:hover{background:rgba(255,255,255,.22)}
+.hero-stats{display:flex;gap:22px;margin-top:18px;flex-wrap:wrap}
+.hero-stat-label{font-size:10px;opacity:.6;margin-bottom:2px;font-weight:500}
+.hero-stat-val{font-size:16px;font-weight:700;letter-spacing:-.01em}
+
+/* ── Section ──────────────────────────────────────────────────────────── */
+.section{margin-bottom:26px}
+.sec-head{margin-bottom:13px;display:flex;align-items:flex-end;
+  justify-content:space-between;gap:10px;flex-wrap:wrap}
+.sec-title{font-size:13px;font-weight:700;color:var(--g900);letter-spacing:-.01em}
+.sec-sub{font-size:11.5px;color:var(--g400);margin-top:2px;line-height:1.5}
+.sec-link{font-size:12px;font-weight:600;color:var(--a);background:none;border:none;
+  cursor:pointer;white-space:nowrap}
+
+/* ── Cards ────────────────────────────────────────────────────────────── */
+.card{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  box-shadow:var(--sh)}
+.card-body{padding:18px 20px}
+
+/* ── Stat grid ────────────────────────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat-card{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  padding:16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:9px}
+.stat-icon{width:32px;height:32px;border-radius:10px;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0}
+.stat-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.stat-val{font-size:22px;font-weight:700;color:var(--g900);letter-spacing:-.02em;line-height:1}
+.stat-label{font-size:11.5px;font-weight:500;color:var(--g600);margin-top:4px}
+.stat-hint{font-size:10.5px;color:var(--g400);margin-top:2px}
+.stat-trend{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;margin-top:3px}
+.stat-trend.up{color:#15803d}.stat-trend.down{color:#b45309}
+.stat-trend svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Chip ─────────────────────────────────────────────────────────────── */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;
+  font-size:11px;font-weight:600;white-space:nowrap;line-height:1.4}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.chip.green{background:var(--green-bg);color:var(--green)}
+.chip.amber{background:var(--amber-bg);color:var(--amber)}
+.chip.red{background:var(--red-bg);color:var(--red)}
+.chip.purple{background:var(--al);color:var(--a)}
+.chip.blue{background:var(--blue-bg);color:var(--blue)}
+.chip.gray{background:var(--g100);color:var(--g600)}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.btn{padding:8px 16px;border-radius:10px;font-size:12.5px;font-weight:600;
+  border:none;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:5px}
+.btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round}
+.btn.primary{background:var(--a);color:white}
+.btn.primary:hover{background:var(--a2)}
+.btn.secondary{background:var(--g100);color:var(--g600)}
+.btn.secondary:hover{background:var(--g200)}
+.btn.ghost{background:var(--al);color:var(--a);border:1px solid var(--am)}
+.btn.ghost:hover{background:var(--a3)}
+.btn.sm{padding:5px 12px;font-size:11.5px;border-radius:8px}
+.btn.full{width:100%;justify-content:center}
+
+/* ── Two-col layout ───────────────────────────────────────────────────── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:start}
+
+/* ── Funding card ─────────────────────────────────────────────────────── */
+.fund-card{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  box-shadow:var(--sh);overflow:hidden}
+.fund-header{padding:16px 20px;border-bottom:1px solid var(--g150);
+  display:flex;align-items:center;justify-content:space-between}
+.fund-amount{font-size:28px;font-weight:800;color:var(--g900);letter-spacing:-.03em;line-height:1}
+.fund-label{font-size:11px;color:var(--g400);margin-top:3px}
+.fund-rows{padding:4px 0}
+.fund-row{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px;border-bottom:1px solid var(--g100)}
+.fund-row:last-child{border-bottom:none}
+.fund-row-label{font-size:12px;color:var(--g500)}
+.fund-row-val{font-size:12.5px;font-weight:600;color:var(--g900)}
+.fund-actions{padding:14px 20px;border-top:1px solid var(--g150);display:flex;gap:8px}
+.prog-bar{height:6px;border-radius:3px;background:var(--g150);overflow:hidden;margin-top:8px}
+.prog-fill{height:100%;border-radius:3px;background:var(--a)}
+
+/* ── Form ─────────────────────────────────────────────────────────────── */
+.form-card{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  box-shadow:var(--sh);padding:20px}
+.form-title{font-size:13px;font-weight:700;color:var(--g900);margin-bottom:2px}
+.form-sub{font-size:11.5px;color:var(--g400);margin-bottom:16px}
+.form-row{margin-bottom:13px}
+.form-label{font-size:11px;font-weight:600;color:var(--g600);text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:5px;display:block}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;border-radius:9px;
+  border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);
+  font-family:inherit;outline:none;transition:all .15s;appearance:none;-webkit-appearance:none}
+.form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a8a49c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:32px;cursor:pointer}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--am);background:white;box-shadow:0 0 0 3px var(--a3)}
+.form-textarea{resize:vertical;min-height:72px;line-height:1.5}
+.form-hint{font-size:11px;color:var(--g400);margin-top:4px}
+.form-actions{display:flex;gap:8px;margin-top:16px}
+.form-status{display:flex;align-items:center;gap:7px;padding:9px 12px;border-radius:9px;
+  background:var(--green-bg);border:1px solid #bbf7d0;font-size:12px;font-weight:500;color:var(--green);margin-top:10px}
+.form-status svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ── Progress stepper ─────────────────────────────────────────────────── */
+.stepper-wrap{padding:6px 0}
+.stepper-desktop{display:flex;align-items:flex-start;position:relative}
+.stepper-line{position:absolute;top:19px;left:20px;right:20px;height:1px;background:var(--g150)}
+.stepper-fill{position:absolute;top:19px;left:20px;height:1px;background:var(--a);
+  transition:width .4s}
+.step{display:flex;flex-direction:column;align-items:center;flex:1;z-index:1;padding:0 4px}
+.step-dot{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;border:2px solid var(--g200);background:white;margin-bottom:8px;flex-shrink:0}
+.step-dot.done{background:#22c55e;border-color:#22c55e}
+.step-dot.active{background:var(--a);border-color:var(--a)}
+.step-dot.wait{background:white;border-color:var(--g200)}
+.step-dot svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round}
+.step-dot.done svg,.step-dot.active svg{stroke:white}
+.step-dot.wait svg{stroke:var(--g300)}
+.step-label{font-size:11.5px;font-weight:600;color:var(--g900);text-align:center;line-height:1.3}
+.step-sub{font-size:10.5px;color:var(--g400);text-align:center;margin-top:2px;line-height:1.4}
+.step-date{font-size:10px;color:var(--g300);margin-top:3px;text-align:center}
+.stepper-mobile{display:none}
+.sml-item{display:flex;gap:12px;padding-bottom:16px;position:relative}
+.sml-item:last-child{padding-bottom:0}
+.sml-col{display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0}
+.sml-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;border:2px solid var(--g200);background:white;flex-shrink:0;z-index:1}
+.sml-dot.done{background:#22c55e;border-color:#22c55e}
+.sml-dot.active{background:var(--a);border-color:var(--a)}
+.sml-dot svg{width:13px;height:13px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sml-dot.wait svg{stroke:var(--g300)}
+.sml-line{flex:1;width:1px;background:var(--g200);margin-top:4px}
+.sml-body{flex:1;min-width:0;padding-top:3px}
+.sml-label{font-size:12.5px;font-weight:600;color:var(--g900)}
+.sml-sub{font-size:11px;color:var(--g500);margin-top:2px}
+
+/* ── Table ────────────────────────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--g150)}
+th{padding:10px 16px;text-align:left;font-size:10.5px;font-weight:600;color:var(--g400);
+  text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+td{padding:13px 16px;font-size:12.5px;color:var(--g700);border-bottom:1px solid var(--g100);
+  vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--g50)}
+td.bold{font-weight:600;color:var(--g900)}
+td.muted{color:var(--g400);font-size:12px}
+.tbl-link{color:var(--a);font-weight:600;font-size:12px;background:none;border:none;cursor:pointer;padding:0}
+
+/* ── Proof list ───────────────────────────────────────────────────────── */
+.proof-list{display:flex;flex-direction:column;gap:10px}
+.proof-item{background:var(--g50);border-radius:var(--r12);border:1px solid var(--g150);
+  padding:14px 16px;display:flex;align-items:center;gap:14px;transition:all .15s}
+.proof-item:hover{background:white;box-shadow:var(--sh)}
+.proof-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.proof-ico svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.proof-label{font-size:12.5px;font-weight:600;color:var(--g900)}
+.proof-desc{font-size:11px;color:var(--g500);margin-top:2px}
+.proof-ref{font-family:'SF Mono','Menlo',monospace;font-size:10px;color:var(--g400);margin-top:3px}
+.proof-view{margin-left:auto;padding:5px 12px;border-radius:8px;background:var(--al);
+  color:var(--a);font-size:11.5px;font-weight:600;border:1px solid var(--am);
+  cursor:pointer;flex-shrink:0;transition:all .12s}
+.proof-view:hover{background:var(--a3)}
+
+/* ── Audit card ───────────────────────────────────────────────────────── */
+.audit-card{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  box-shadow:var(--sh);padding:20px}
+.audit-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+.audit-field{background:var(--g50);border-radius:10px;padding:10px 12px;border:1px solid var(--g150)}
+.audit-key{font-size:10px;color:var(--g400);font-weight:500;margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.audit-val{font-size:12.5px;font-weight:600;color:var(--g900)}
+
+/* ── Activity feed ────────────────────────────────────────────────────── */
+.feed-item{display:flex;align-items:center;gap:12px;padding:11px 20px;
+  border-bottom:1px solid var(--g100)}
+.feed-item:last-child{border-bottom:none}
+.feed-dot{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.feed-dot svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.feed-text{flex:1;font-size:12.5px;color:var(--g700);line-height:1.45}
+.feed-text strong{color:var(--g900);font-weight:600}
+.feed-time{font-size:10.5px;color:var(--g400);white-space:nowrap}
+
+/* ── Mobile cards for history ─────────────────────────────────────────── */
+.mobile-history{display:none}
+.mhc{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  padding:14px 16px;box-shadow:var(--sh);margin-bottom:10px}
+.mhc-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.mhc-title{font-size:13px;font-weight:700;color:var(--g900)}
+.mhc-date{font-size:11px;color:var(--g400);margin-top:2px}
+.mhc-row{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.mhc-key{font-size:11px;color:var(--g400)}
+.mhc-val{font-size:12px;font-weight:600;color:var(--g900)}
+
+/* ── Modal ────────────────────────────────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.22);
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  z-index:100;display:none;align-items:flex-end;justify-content:center;padding:0}
+.modal-overlay.open{display:flex}
+@media(min-width:600px){.modal-overlay{align-items:center;padding:20px}}
+.modal{background:white;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;
+  border-radius:var(--r24) var(--r24) 0 0;box-shadow:0 24px 64px rgba(0,0,0,.16)}
+@media(min-width:600px){.modal{border-radius:var(--r24)}}
+.modal-head{padding:18px 20px 14px;border-bottom:1px solid var(--g100);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:white;z-index:2;
+  border-radius:var(--r24) var(--r24) 0 0}
+@media(min-width:600px){.modal-head{border-radius:var(--r24) var(--r24) 0 0}}
+.modal-title{font-size:14px;font-weight:700;color:var(--g900)}
+.modal-close{width:26px;height:26px;border-radius:8px;background:var(--g100);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g500)}
+.modal-close svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round}
+.modal-body{padding:16px 20px 22px}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.kv-item{background:var(--g50);border-radius:9px;padding:10px 12px;border:1px solid var(--g100)}
+.kv-key{font-size:10px;color:var(--g400);font-weight:500;margin-bottom:2px;
+  text-transform:uppercase;letter-spacing:.04em}
+.kv-val{font-size:12.5px;font-weight:600;color:var(--g900)}
+.mono-box{background:var(--g50);border-radius:8px;padding:10px 12px;
+  font-family:'SF Mono','Menlo',monospace;font-size:10.5px;color:var(--g500);
+  word-break:break-all;border:1px solid var(--g150);line-height:1.6;margin-top:4px}
+
+/* ── Tab strip ────────────────────────────────────────────────────────── */
+.tab-strip{display:flex;gap:2px;background:var(--g100);border-radius:10px;
+  padding:3px;width:fit-content;margin-bottom:18px}
+.tab{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;color:var(--g500);
+  border:none;background:none;cursor:pointer;transition:all .13s}
+.tab.active{background:white;color:var(--g900);font-weight:600;
+  box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* ── Bottom nav mobile ────────────────────────────────────────────────── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:white;
+  border-top:1px solid var(--g200);z-index:40;
+  padding-bottom:env(safe-area-inset-bottom,0)}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:9px 0 7px;background:none;border:none;cursor:pointer;
+  color:var(--g400);font-size:10px;font-weight:500;gap:3px;transition:color .12s}
+.bn-item.active{color:var(--a)}
+.bn-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media(max-width:900px){
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .stepper-desktop{display:none}
+  .stepper-mobile{display:block}
+}
+@media(max-width:768px){
+  .sidebar{display:none}
+  .content{padding:14px 14px 80px}
+  .two-col{grid-template-columns:1fr}
+  .three-col{grid-template-columns:1fr}
+  .bottom-nav{display:flex}
+  .topbar{padding:0 14px}
+  .search-wrap{display:none}
+  .desktop-table{display:none}
+  .mobile-history{display:block}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-stats{gap:14px}
+  .audit-fields{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ SIDEBAR ════════════════════════════ -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">RoyaltyOS</div>
+      <div class="brand-sub">Reporter Portal</div>
+    </div>
+  </div>
+
+  <span class="nav-group-label">Workspace</span>
+  <button class="nav-item active" onclick="navTo('overview',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Overview
+  </button>
+  <button class="nav-item" onclick="navTo('operations',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Operations
+    <span class="nav-badge">3</span>
+  </button>
+  <button class="nav-item" onclick="navTo('records',this)">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    Records
+  </button>
+
+  <span class="nav-group-label">Account</span>
+  <button class="nav-item" onclick="navTo('settings',this)">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Settings
+  </button>
+
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">MS</div>
+      <div>
+        <div class="user-name">Metro Sounds</div>
+        <div class="user-role">DSP / Reporter</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════ MAIN ═══════════════════════════════ -->
+<div class="main">
+
+  <!-- Top header -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="tb-title">Overview</div>
+      <span class="role-badge">DSP / Reporter</span>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search works, records…"/>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn notif-pip" title="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <div class="avatar" style="cursor:pointer">MS</div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ══════════════════ PAGE: OVERVIEW ══════════════════════════════════ -->
+    <div class="page active" id="page-overview">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-inner">
+          <div class="hero-label">RoyaltyOS · DSP Dashboard</div>
+          <div class="hero-title">Manage usage and payments with clarity</div>
+          <div class="hero-sub">Submit usage records, track payment progress, and keep supporting records ready in one place.</div>
+          <div class="hero-actions">
+            <button class="hero-btn primary" onclick="navTo('operations',document.querySelector('[onclick*=operations]'))">Submit Usage</button>
+            <button class="hero-btn secondary" onclick="navTo('records',document.querySelector('[onclick*=records]'))">View Records</button>
+          </div>
+          <div class="hero-stats">
+            <div><div class="hero-stat-label">Available Funds</div><div class="hero-stat-val">$24,800</div></div>
+            <div><div class="hero-stat-label">Pending Submissions</div><div class="hero-stat-val">3</div></div>
+            <div><div class="hero-stat-label">Payments Sent Today</div><div class="hero-stat-val">$6,240</div></div>
+          </div>
+        </div>
+        <div class="hero-orb"></div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="section">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Operations Overview</div>
+            <div class="sec-sub">Manage usage submissions, funding, payment flow, and supporting records in one place.</div>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#f8f0fa;color:#a038b2">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <div>
+              <div class="stat-val">$24,800</div>
+              <div class="stat-label">Available Funds</div>
+              <div class="stat-hint">Ready for payment</div>
+            </div>
+            <div class="stat-trend up">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              Funded Apr 10
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fffaeb;color:#92400e">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+            </div>
+            <div>
+              <div class="stat-val">3</div>
+              <div class="stat-label">Pending Usage Records</div>
+              <div class="stat-hint">Awaiting submission</div>
+            </div>
+            <div class="stat-trend down">
+              <svg viewBox="0 0 24 24"><polyline points="18 9 12 15 6 9"/></svg>
+              2 due today
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#edf7f2;color:#15803d">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div>
+              <div class="stat-val">$6,240</div>
+              <div class="stat-label">Payments Sent Today</div>
+              <div class="stat-hint">3 transactions</div>
+            </div>
+            <div class="stat-trend up">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              On schedule
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#eff6ff;color:#1e3fa0">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="stat-val">18</div>
+              <div class="stat-label">Proof Records Saved</div>
+              <div class="stat-hint">This billing period</div>
+            </div>
+            <div class="stat-trend up">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              All verified
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two col: Funding snapshot + Quick submit -->
+      <div class="two-col">
+        <!-- Funding snapshot -->
+        <div class="section">
+          <div class="sec-head">
+            <div>
+              <div class="sec-title">Funding Status</div>
+              <div class="sec-sub">Your current payment capacity.</div>
+            </div>
+            <button class="sec-link" onclick="navTo('operations',document.querySelector('[onclick*=operations]'))">Manage →</button>
+          </div>
+          <div class="fund-card">
+            <div class="fund-header">
+              <div>
+                <div class="fund-amount">$24,800</div>
+                <div class="fund-label">Total available balance</div>
+              </div>
+              <span class="chip green">Funded</span>
+            </div>
+            <div class="fund-rows">
+              <div class="fund-row">
+                <span class="fund-row-label">Ready for payment</span>
+                <span class="fund-row-val">$18,400</span>
+              </div>
+              <div class="fund-row">
+                <span class="fund-row-label">Reserved (pending)</span>
+                <span class="fund-row-val">$6,400</span>
+              </div>
+              <div class="fund-row">
+                <span class="fund-row-label">Last top-up</span>
+                <span class="fund-row-val">Apr 10, 2025</span>
+              </div>
+            </div>
+            <div style="padding:0 20px 14px">
+              <div style="font-size:10.5px;color:var(--g400);margin-bottom:4px">Capacity used: 74%</div>
+              <div class="prog-bar"><div class="prog-fill" style="width:74%"></div></div>
+            </div>
+            <div class="fund-actions">
+              <button class="btn primary sm" onclick="openModal('modal-addfunds')">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Funds
+              </button>
+              <button class="btn secondary sm" onclick="openModal('modal-fundhistory')">View History</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick activity -->
+        <div class="section">
+          <div class="sec-head">
+            <div>
+              <div class="sec-title">Recent Activity</div>
+              <div class="sec-sub">Latest events across your account.</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="feed-text"><strong>Payment sent</strong> · Resonance Vol. 1 — $842.00</div>
+              <div class="feed-time">Apr 10</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#eff6ff;color:#1e3fa0"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <div class="feed-text"><strong>Proof saved</strong> · Usage record for Apr cycle</div>
+              <div class="feed-time">Apr 10</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#f8f0fa;color:#a038b2"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+              <div class="feed-text"><strong>Usage submitted</strong> · The Quiet Hours EP — 1,830 streams</div>
+              <div class="feed-time">Apr 9</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+              <div class="feed-text"><strong>Funds added</strong> · $10,000 deposited to account</div>
+              <div class="feed-time">Apr 9</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#fffaeb;color:#92400e"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              <div class="feed-text"><strong>Submission pending</strong> · Urban Drift — review needed</div>
+              <div class="feed-time">Apr 8</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Status preview -->
+      <div class="section">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Payment Status</div>
+            <div class="sec-sub">Current progress for your most recent payment cycle.</div>
+          </div>
+          <button class="sec-link" onclick="navTo('operations',document.querySelector('[onclick*=operations]'))">Full view →</button>
+        </div>
+        <div class="card card-body">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+            <span style="font-size:12px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.04em">Resonance Vol. 1</span>
+            <span style="color:var(--g300);font-size:12px">·</span>
+            <span style="font-size:12px;color:var(--g400)">April 2025 cycle</span>
+            <span class="chip green" style="margin-left:auto">3 of 4 complete</span>
+          </div>
+          <!-- Stepper desktop -->
+          <div class="stepper-wrap">
+            <div class="stepper-desktop">
+              <div class="stepper-line"></div>
+              <div class="stepper-fill" style="width:calc(66% - 12px)"></div>
+              <div class="step">
+                <div class="step-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                <div class="step-label">Usage Recorded</div>
+                <div class="step-sub">Streams logged</div>
+                <div class="step-date">Apr 1</div>
+              </div>
+              <div class="step">
+                <div class="step-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                <div class="step-label">Funds Confirmed</div>
+                <div class="step-sub">Balance verified</div>
+                <div class="step-date">Apr 5</div>
+              </div>
+              <div class="step">
+                <div class="step-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                <div class="step-label">Payment Sent</div>
+                <div class="step-sub">$842.00 disbursed</div>
+                <div class="step-date">Apr 10</div>
+              </div>
+              <div class="step">
+                <div class="step-dot active"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="step-label">Proof Saved</div>
+                <div class="step-sub">Saving record…</div>
+                <div class="step-date">In progress</div>
+              </div>
+            </div>
+            <!-- Stepper mobile -->
+            <div class="stepper-mobile">
+              <div class="sml-item">
+                <div class="sml-col"><div class="sml-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="sml-line"></div></div>
+                <div class="sml-body"><div class="sml-label">Usage Recorded</div><div class="sml-sub">Streams logged · Apr 1</div></div>
+              </div>
+              <div class="sml-item">
+                <div class="sml-col"><div class="sml-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="sml-line"></div></div>
+                <div class="sml-body"><div class="sml-label">Funds Confirmed</div><div class="sml-sub">Balance verified · Apr 5</div></div>
+              </div>
+              <div class="sml-item">
+                <div class="sml-col"><div class="sml-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="sml-line"></div></div>
+                <div class="sml-body"><div class="sml-label">Payment Sent</div><div class="sml-sub">$842.00 disbursed · Apr 10</div></div>
+              </div>
+              <div class="sml-item">
+                <div class="sml-col"><div class="sml-dot active"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+                <div class="sml-body"><div class="sml-label">Proof Saved</div><div class="sml-sub">Saving record… · In progress</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /overview -->
+
+
+    <!-- ══════════════════ PAGE: OPERATIONS ════════════════════════════════ -->
+    <div class="page" id="page-operations">
+
+      <!-- Funding Status -->
+      <div class="section">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Funding Status</div>
+            <div class="sec-sub">Understand your available payment capacity before submitting usage.</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="fund-card">
+            <div class="fund-header">
+              <div>
+                <div class="fund-amount">$24,800</div>
+                <div class="fund-label">Total available balance</div>
+              </div>
+              <span class="chip green">Funded</span>
+            </div>
+            <div class="fund-rows">
+              <div class="fund-row"><span class="fund-row-label">Ready for payment</span><span class="fund-row-val">$18,400</span></div>
+              <div class="fund-row"><span class="fund-row-label">Reserved (pending)</span><span class="fund-row-val">$6,400</span></div>
+              <div class="fund-row"><span class="fund-row-label">Last top-up</span><span class="fund-row-val">Apr 10, 2025</span></div>
+              <div class="fund-row"><span class="fund-row-label">Top-up source</span><span class="fund-row-val">Bank transfer</span></div>
+            </div>
+            <div style="padding:0 20px 14px">
+              <div style="font-size:10.5px;color:var(--g400);margin-bottom:4px">Capacity used: 74%</div>
+              <div class="prog-bar"><div class="prog-fill" style="width:74%"></div></div>
+            </div>
+            <div class="fund-actions">
+              <button class="btn primary sm" onclick="openModal('modal-addfunds')">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Funds
+              </button>
+              <button class="btn secondary sm" onclick="openModal('modal-fundhistory')">View History</button>
+            </div>
+          </div>
+          <div class="card card-body" style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:12.5px;font-weight:700;color:var(--g900);margin-bottom:4px">Recent Funding Actions</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100)">
+              <div><div style="font-size:12.5px;font-weight:500;color:var(--g900)">Bank deposit</div><div style="font-size:11px;color:var(--g400)">Apr 10, 2025</div></div>
+              <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:#15803d">+$10,000</div><span class="chip green" style="font-size:10px">Confirmed</span></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--g100)">
+              <div><div style="font-size:12.5px;font-weight:500;color:var(--g900)">Bank deposit</div><div style="font-size:11px;color:var(--g400)">Mar 28, 2025</div></div>
+              <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:#15803d">+$15,000</div><span class="chip green" style="font-size:10px">Confirmed</span></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+              <div><div style="font-size:12.5px;font-weight:500;color:var(--g900)">Payment deducted</div><div style="font-size:11px;color:var(--g400)">Apr 10, 2025</div></div>
+              <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--red)">−$6,240</div><span class="chip green" style="font-size:10px">Sent</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Usage Submission Form -->
+      <div class="section">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Submit Usage Record</div>
+            <div class="sec-sub">Enter the usage details for a work. Accurate records ensure correct royalty calculation.</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="form-card">
+            <div class="form-title">New Usage Submission</div>
+            <div class="form-sub">Select a work and enter the usage count for the current billing period.</div>
+            <div class="form-row">
+              <label class="form-label">Select Work</label>
+              <select class="form-select" id="sel-work">
+                <option value="">Choose a registered work…</option>
+                <option value="rv1">Resonance Vol. 1</option>
+                <option value="qhep">The Quiet Hours EP</option>
+                <option value="uad">Urban Drift Photography</option>
+                <option value="eos">Echoes of Spring</option>
+                <option value="nms">Night Market Series</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Usage Count</label>
+              <input class="form-input" type="number" placeholder="e.g. 7200" id="inp-usage"/>
+              <div class="form-hint">Total streams, plays, or downloads for this period.</div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Reference Note</label>
+              <textarea class="form-textarea" placeholder="Optional note — e.g. April 2025 billing cycle, platform: Metro DSP…" id="inp-note"></textarea>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Submission Period</label>
+              <input class="form-input" type="text" placeholder="e.g. April 2025" id="inp-period"/>
+            </div>
+            <div class="form-actions">
+              <button class="btn primary" onclick="submitUsage()">
+                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Submit Usage
+              </button>
+              <button class="btn secondary" onclick="saveDraft()">Save Draft</button>
+            </div>
+            <div id="form-success" style="display:none" class="form-status">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Usage submitted successfully. Proof will be generated shortly.
+            </div>
+            <div id="form-draft" style="display:none" class="form-status" style="background:#fffaeb;border-color:#fde68a;color:#92400e">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Draft saved. You can return to finish this submission later.
+            </div>
+          </div>
+
+          <!-- Payment Status tracker -->
+          <div>
+            <div class="form-card">
+              <div class="form-title" style="margin-bottom:4px">Payment Status</div>
+              <div class="form-sub">Current progress for the most recent payment flow.</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+                <span style="font-size:11.5px;font-weight:600;color:var(--g700)">Resonance Vol. 1</span>
+                <span class="chip green" style="margin-left:auto">3 of 4 complete</span>
+              </div>
+              <div class="stepper-mobile" style="display:block">
+                <div class="sml-item">
+                  <div class="sml-col"><div class="sml-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="sml-line"></div></div>
+                  <div class="sml-body"><div class="sml-label">Usage Recorded</div><div class="sml-sub">7,200 streams · Apr 1</div></div>
+                </div>
+                <div class="sml-item">
+                  <div class="sml-col"><div class="sml-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="sml-line"></div></div>
+                  <div class="sml-body"><div class="sml-label">Funds Confirmed</div><div class="sml-sub">$842 reserved · Apr 5</div></div>
+                </div>
+                <div class="sml-item">
+                  <div class="sml-col"><div class="sml-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="sml-line"></div></div>
+                  <div class="sml-body"><div class="sml-label">Payment Sent</div><div class="sml-sub">$842.00 disbursed · Apr 10</div></div>
+                </div>
+                <div class="sml-item">
+                  <div class="sml-col"><div class="sml-dot active"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+                  <div class="sml-body"><div class="sml-label">Proof Saved</div><div class="sml-sub">Saving record… · In progress</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submission History -->
+      <div class="section">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Submission History</div>
+            <div class="sec-sub">All usage records you have submitted this period.</div>
+          </div>
+          <div class="tab-strip">
+            <button class="tab active" onclick="filterHistory('all',this)">All</button>
+            <button class="tab" onclick="filterHistory('completed',this)">Completed</button>
+            <button class="tab" onclick="filterHistory('pending',this)">Pending</button>
+          </div>
+        </div>
+
+        <!-- Desktop table -->
+        <div class="card desktop-table">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th><th>Work</th><th>Usage Amount</th><th>Payment Result</th><th>Status</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr data-status="completed">
+                  <td class="muted">Apr 10, 2025</td>
+                  <td class="bold">Resonance Vol. 1</td>
+                  <td>7,200 streams</td>
+                  <td class="bold">$842.00</td>
+                  <td><span class="chip green">Completed</span></td>
+                  <td><button class="tbl-link" onclick="openModal('modal-detail')">View Details</button></td>
+                </tr>
+                <tr data-status="completed">
+                  <td class="muted">Mar 15, 2025</td>
+                  <td class="bold">The Quiet Hours EP</td>
+                  <td>1,830 streams</td>
+                  <td class="bold">$214.50</td>
+                  <td><span class="chip green">Completed</span></td>
+                  <td><button class="tbl-link" onclick="openModal('modal-detail')">View Details</button></td>
+                </tr>
+                <tr data-status="pending">
+                  <td class="muted">Apr 8, 2025</td>
+                  <td class="bold">Urban Drift Photography</td>
+                  <td>342 views</td>
+                  <td class="muted">Pending</td>
+                  <td><span class="chip amber">Pending</span></td>
+                  <td><button class="tbl-link" onclick="openModal('modal-detail')">View Details</button></td>
+                </tr>
+                <tr data-status="completed">
+                  <td class="muted">Feb 28, 2025</td>
+                  <td class="bold">Resonance Vol. 1</td>
+                  <td>5,100 streams</td>
+                  <td class="bold">$598.20</td>
+                  <td><span class="chip green">Completed</span></td>
+                  <td><button class="tbl-link" onclick="openModal('modal-detail')">View Details</button></td>
+                </tr>
+                <tr data-status="pending">
+                  <td class="muted">Apr 9, 2025</td>
+                  <td class="bold">Echoes of Spring</td>
+                  <td>4,250 streams</td>
+                  <td class="muted">Pending</td>
+                  <td><span class="chip amber">Pending</span></td>
+                  <td><button class="tbl-link" onclick="openModal('modal-detail')">View Details</button></td>
+                </tr>
+                <tr data-status="completed">
+                  <td class="muted">Feb 1, 2025</td>
+                  <td class="bold">Resonance Vol. 1</td>
+                  <td>3,440 streams</td>
+                  <td class="bold">$403.00</td>
+                  <td><span class="chip green">Completed</span></td>
+                  <td><button class="tbl-link" onclick="openModal('modal-detail')">View Details</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Mobile stacked cards -->
+        <div class="mobile-history" id="history-mobile">
+          <div class="mhc" data-status="completed">
+            <div class="mhc-header"><div><div class="mhc-title">Resonance Vol. 1</div><div class="mhc-date">Apr 10, 2025</div></div><span class="chip green">Completed</span></div>
+            <div class="mhc-row"><span class="mhc-key">Usage</span><span class="mhc-val">7,200 streams</span></div>
+            <div class="mhc-row"><span class="mhc-key">Payment</span><span class="mhc-val">$842.00</span></div>
+            <div style="margin-top:10px"><button class="btn ghost sm full" onclick="openModal('modal-detail')">View Details</button></div>
+          </div>
+          <div class="mhc" data-status="pending">
+            <div class="mhc-header"><div><div class="mhc-title">Urban Drift Photography</div><div class="mhc-date">Apr 8, 2025</div></div><span class="chip amber">Pending</span></div>
+            <div class="mhc-row"><span class="mhc-key">Usage</span><span class="mhc-val">342 views</span></div>
+            <div class="mhc-row"><span class="mhc-key">Payment</span><span class="mhc-val">Pending</span></div>
+            <div style="margin-top:10px"><button class="btn ghost sm full" onclick="openModal('modal-detail')">View Details</button></div>
+          </div>
+          <div class="mhc" data-status="completed">
+            <div class="mhc-header"><div><div class="mhc-title">The Quiet Hours EP</div><div class="mhc-date">Mar 15, 2025</div></div><span class="chip green">Completed</span></div>
+            <div class="mhc-row"><span class="mhc-key">Usage</span><span class="mhc-val">1,830 streams</span></div>
+            <div class="mhc-row"><span class="mhc-key">Payment</span><span class="mhc-val">$214.50</span></div>
+            <div style="margin-top:10px"><button class="btn ghost sm full" onclick="openModal('modal-detail')">View Details</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /operations -->
+
+
+    <!-- ══════════════════ PAGE: RECORDS ════════════════════════════════════ -->
+    <div class="page" id="page-records">
+
+      <!-- Payment Proof -->
+      <div class="section">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Payment Proof</div>
+            <div class="sec-sub">Verified evidence that your usage and payments have been properly recorded. Each item below is a confirmed record.</div>
+          </div>
+        </div>
+        <div class="proof-list">
+          <div class="proof-item">
+            <div class="proof-ico" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Usage Recorded — Resonance Vol. 1</div>
+              <div class="proof-desc">7,200 streams logged for April billing cycle</div>
+              <div class="proof-ref">Ref: 0x7d2e9f1a…f89a · Apr 1, 2025</div>
+            </div>
+            <span class="chip green">Verified</span>
+            <button class="proof-view" onclick="openModal('modal-techdetail')">View Details</button>
+          </div>
+          <div class="proof-item">
+            <div class="proof-ico" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Payment Completed — Resonance Vol. 1</div>
+              <div class="proof-desc">$842.00 disbursed to creator account</div>
+              <div class="proof-ref">Ref: 0x1bc4e2d9…290c · Apr 10, 2025</div>
+            </div>
+            <span class="chip green">Verified</span>
+            <button class="proof-view" onclick="openModal('modal-techdetail')">View Details</button>
+          </div>
+          <div class="proof-item">
+            <div class="proof-ico" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Usage Recorded — The Quiet Hours EP</div>
+              <div class="proof-desc">1,830 streams logged for March billing cycle</div>
+              <div class="proof-ref">Ref: 0x8f3b1c7d…a45e · Mar 5, 2025</div>
+            </div>
+            <span class="chip green">Verified</span>
+            <button class="proof-view" onclick="openModal('modal-techdetail')">View Details</button>
+          </div>
+          <div class="proof-item">
+            <div class="proof-ico" style="background:#eff6ff;color:#1e3fa0"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Record Saved — April Audit Bundle</div>
+              <div class="proof-desc">Supporting records for April cycle stored successfully</div>
+              <div class="proof-ref">Ref: 0x4c9a2b8e…33df · Apr 11, 2025</div>
+            </div>
+            <span class="chip blue">Stored</span>
+            <button class="proof-view" onclick="openModal('modal-techdetail')">View Details</button>
+          </div>
+          <div class="proof-item">
+            <div class="proof-ico" style="background:#fffaeb;color:#92400e"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Proof Available — Urban Drift Photography</div>
+              <div class="proof-desc">Usage submitted, awaiting payment confirmation</div>
+              <div class="proof-ref">Submitted Apr 8, 2025 · Under review</div>
+            </div>
+            <span class="chip amber">Pending</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit Bundle Submission -->
+      <div class="section">
+        <div class="sec-head">
+          <div>
+            <div class="sec-title">Audit Bundle Submission</div>
+            <div class="sec-sub">Store supporting records after the payment flow is complete. These are kept as permanent reference.</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="audit-card">
+            <div class="form-title" style="margin-bottom:4px">Save a Proof Record</div>
+            <div class="form-sub">Group related usage and payment records into a single bundle for this period.</div>
+            <div class="audit-fields">
+              <div class="audit-field"><div class="audit-key">Covered Period</div><div class="audit-val">April 2025</div></div>
+              <div class="audit-field"><div class="audit-key">Record Status</div><div class="audit-val" style="color:#15803d">Ready to save</div></div>
+              <div class="audit-field"><div class="audit-key">Works Included</div><div class="audit-val">Resonance Vol. 1</div></div>
+              <div class="audit-field"><div class="audit-key">Payments Covered</div><div class="audit-val">$842.00</div></div>
+            </div>
+            <div class="form-row">
+              <label class="form-label">Reference Summary</label>
+              <textarea class="form-textarea" placeholder="Brief description of this audit bundle — e.g. April 2025 full cycle for Metro Sounds DSP, includes 3 works, 2 payments…"></textarea>
+            </div>
+            <div class="form-actions">
+              <button class="btn primary" onclick="alert('Proof record saved successfully.')">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Save Proof Record
+              </button>
+              <button class="btn secondary" onclick="openModal('modal-savedrecords')">View Saved Records</button>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--g900);margin-bottom:12px">Recent Activity</div>
+            <div class="card">
+              <div class="feed-item">
+                <div class="feed-dot" style="background:#eff6ff;color:#1e3fa0"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="feed-text"><strong>Proof saved</strong> · April audit bundle stored</div>
+                <div class="feed-time">Apr 11</div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-dot" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+                <div class="feed-text"><strong>Payment completed</strong> · $842.00 sent for Resonance Vol. 1</div>
+                <div class="feed-time">Apr 10</div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-dot" style="background:#f8f0fa;color:#a038b2"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <div class="feed-text"><strong>Usage submitted</strong> · 7,200 streams for Resonance Vol. 1</div>
+                <div class="feed-time">Apr 1</div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-dot" style="background:#eff6ff;color:#1e3fa0"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="feed-text"><strong>Proof saved</strong> · March audit bundle stored</div>
+                <div class="feed-time">Mar 31</div>
+              </div>
+              <div class="feed-item">
+                <div class="feed-dot" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+                <div class="feed-text"><strong>Funds added</strong> · $10,000 deposited</div>
+                <div class="feed-time">Apr 9</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /records -->
+
+
+    <!-- ══════════════════ PAGE: SETTINGS ═══════════════════════════════════ -->
+    <div class="page" id="page-settings">
+      <div class="section">
+        <div class="sec-head"><div><div class="sec-title">Settings</div><div class="sec-sub">Manage your account preferences.</div></div></div>
+        <div class="card card-body" style="max-width:500px">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="form-row" style="margin:0"><label class="form-label">Organization Name</label><input class="form-input" value="Metro Sounds DSP"></div>
+            <div class="form-row" style="margin:0"><label class="form-label">Role</label><input class="form-input" value="DSP / Reporter" readonly style="background:var(--g100);color:var(--g500)"></div>
+            <div class="form-row" style="margin:0"><label class="form-label">Contact Email</label><input class="form-input" value="ops@metrosounds.co"></div>
+            <div class="form-row" style="margin:0"><label class="form-label">Notification Preference</label>
+              <select class="form-select"><option>Email + In-app</option><option>Email only</option><option>In-app only</option></select>
+            </div>
+            <div><button class="btn primary" onclick="alert('Settings saved.')">Save Changes</button></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /settings -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Bottom nav (mobile) -->
+<nav class="bottom-nav">
+  <button class="bn-item active" onclick="navTo('overview',this,true)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Overview
+  </button>
+  <button class="bn-item" onclick="navTo('operations',this,true)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Operations
+  </button>
+  <button class="bn-item" onclick="navTo('records',this,true)">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Records
+  </button>
+  <button class="bn-item" onclick="navTo('settings',this,true)">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Settings
+  </button>
+</nav>
+
+
+<!-- ═══════════════════════════════════ MODALS ═════════════════════════════ -->
+
+<!-- Detail modal -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Submission Details</div>
+      <button class="modal-close" onclick="closeModal('modal-detail')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="kv-grid">
+        <div class="kv-item"><div class="kv-key">Work</div><div class="kv-val">Resonance Vol. 1</div></div>
+        <div class="kv-item"><div class="kv-key">Date submitted</div><div class="kv-val">Apr 10, 2025</div></div>
+        <div class="kv-item"><div class="kv-key">Usage count</div><div class="kv-val">7,200 streams</div></div>
+        <div class="kv-item"><div class="kv-key">Payment result</div><div class="kv-val" style="color:#15803d">$842.00</div></div>
+        <div class="kv-item"><div class="kv-key">Status</div><div class="kv-val" style="color:#15803d">Completed</div></div>
+        <div class="kv-item"><div class="kv-key">Period</div><div class="kv-val">April 2025</div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Reference Note</div>
+        <div style="font-size:12.5px;color:var(--g700);line-height:1.6">April 2025 billing cycle — Metro DSP. Includes all streaming activity from Apr 1–30.</div>
+      </div>
+      <button class="btn primary full" onclick="closeModal('modal-detail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Technical detail modal -->
+<div class="modal-overlay" id="modal-techdetail">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Technical Record Details</div>
+      <button class="modal-close" onclick="closeModal('modal-techdetail')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="kv-grid">
+        <div class="kv-item"><div class="kv-key">Event</div><div class="kv-val">Usage Recorded</div></div>
+        <div class="kv-item"><div class="kv-key">Date stored</div><div class="kv-val">Apr 1, 2025</div></div>
+        <div class="kv-item"><div class="kv-key">Storage type</div><div class="kv-val">Distributed ledger</div></div>
+        <div class="kv-item"><div class="kv-key">Immutable</div><div class="kv-val">Yes</div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Transaction Reference</div>
+        <div class="mono-box">0x7d2e9f1a4b6c3d8e5f2a9b1c7e4d6f3a2b8c9e1d5f7a3b4c6d8e9f0a1b2c3d4e5f6</div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Submitted By</div>
+        <div style="font-size:12.5px;color:var(--g700)">Metro Sounds DSP · RoyaltyOS Platform</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn primary" style="flex:1;justify-content:center" onclick="alert('Opening record explorer...');closeModal('modal-techdetail')">View on Explorer</button>
+        <button class="btn secondary" style="flex:1;justify-content:center" onclick="closeModal('modal-techdetail')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Funds modal -->
+<div class="modal-overlay" id="modal-addfunds">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Add Funds</div>
+      <button class="modal-close" onclick="closeModal('modal-addfunds')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-label">Amount</label><input class="form-input" type="number" placeholder="e.g. 10000"/></div>
+      <div class="form-row"><label class="form-label">Source</label>
+        <select class="form-select"><option>Bank transfer</option><option>Wire transfer</option><option>Internal allocation</option></select>
+      </div>
+      <div class="form-row"><label class="form-label">Reference Note</label><input class="form-input" placeholder="Optional reference…"/></div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn primary" style="flex:1;justify-content:center" onclick="alert('Funding request submitted.');closeModal('modal-addfunds')">Submit Request</button>
+        <button class="btn secondary" style="flex:1;justify-content:center" onclick="closeModal('modal-addfunds')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fund history modal -->
+<div class="modal-overlay" id="modal-fundhistory">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Funding History</div>
+      <button class="modal-close" onclick="closeModal('modal-fundhistory')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--g100)">
+          <div><div style="font-size:12.5px;font-weight:500;color:var(--g900)">Bank deposit</div><div style="font-size:11px;color:var(--g400)">Apr 10, 2025</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:#15803d">+$10,000</div><span class="chip green" style="font-size:10px">Confirmed</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--g100)">
+          <div><div style="font-size:12.5px;font-weight:500;color:var(--g900)">Bank deposit</div><div style="font-size:11px;color:var(--g400)">Mar 28, 2025</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:#15803d">+$15,000</div><span class="chip green" style="font-size:10px">Confirmed</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--g100)">
+          <div><div style="font-size:12.5px;font-weight:500;color:var(--g900)">Payment deducted</div><div style="font-size:11px;color:var(--g400)">Apr 10, 2025</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--red)">−$6,240</div><span class="chip green" style="font-size:10px">Sent</span></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0">
+          <div><div style="font-size:12.5px;font-weight:500;color:var(--g900)">Bank deposit</div><div style="font-size:11px;color:var(--g400)">Feb 15, 2025</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:#15803d">+$20,000</div><span class="chip green" style="font-size:10px">Confirmed</span></div>
+        </div>
+      </div>
+      <button class="btn secondary full" style="margin-top:14px" onclick="closeModal('modal-fundhistory')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Saved records modal -->
+<div class="modal-overlay" id="modal-savedrecords">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Saved Proof Records</div>
+      <button class="modal-close" onclick="closeModal('modal-savedrecords')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="kv-item" style="border-radius:10px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+            <div class="kv-key">April 2025 Audit Bundle</div>
+            <span class="chip blue">Stored</span>
+          </div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--g900)">Resonance Vol. 1 · $842.00 · 7,200 streams</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:3px">Ref: 0x4c9a2b8e…33df · Saved Apr 11, 2025</div>
+        </div>
+        <div class="kv-item" style="border-radius:10px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+            <div class="kv-key">March 2025 Audit Bundle</div>
+            <span class="chip blue">Stored</span>
+          </div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--g900)">The Quiet Hours EP · $214.50 · 1,830 streams</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:3px">Ref: 0x9e3f1d2a…88bc · Saved Mar 31, 2025</div>
+        </div>
+      </div>
+      <button class="btn secondary full" style="margin-top:14px" onclick="closeModal('modal-savedrecords')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* Navigation */
+const pageTitles = {
+  overview:'Overview', operations:'Operations', records:'Records', settings:'Settings'
+};
+
+function navTo(id, el, mobile) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('tb-title').textContent = pageTitles[id] || id;
+  if (mobile) {
+    document.querySelectorAll('.bn-item').forEach(n => n.classList.remove('active'));
+  } else {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  }
+  if (el) el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* Modals */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', function(e) {
+    if (e.target === this) { this.classList.remove('open'); document.body.style.overflow = ''; }
+  });
+});
+
+/* Form actions */
+function submitUsage() {
+  const work = document.getElementById('sel-work').value;
+  const usage = document.getElementById('inp-usage').value;
+  if (!work || !usage) { alert('Please select a work and enter a usage count.'); return; }
+  document.getElementById('form-success').style.display = 'flex';
+  document.getElementById('form-draft').style.display = 'none';
+  document.getElementById('sel-work').value = '';
+  document.getElementById('inp-usage').value = '';
+  document.getElementById('inp-note').value = '';
+  document.getElementById('inp-period').value = '';
+  setTimeout(() => { document.getElementById('form-success').style.display = 'none'; }, 5000);
+}
+function saveDraft() {
+  document.getElementById('form-draft').style.display = 'flex';
+  document.getElementById('form-success').style.display = 'none';
+  setTimeout(() => { document.getElementById('form-draft').style.display = 'none'; }, 4000);
+}
+
+/* History filter */
+function filterHistory(type, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const rows = document.querySelectorAll('#history-tbody tr');
+  const cards = document.querySelectorAll('#history-mobile .mhc');
+  const show = type === 'all' ? () => true : r => r.dataset.status === type;
+  rows.forEach(r => { r.style.display = show(r) ? '' : 'none'; });
+  cards.forEach(c => { c.style.display = show(c) ? '' : 'none'; });
+}
+</script>
+</body>
+</html>

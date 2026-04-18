@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RoyaltyOS · Creator Dashboard</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f3f8}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+
+/* ── Theme ─────────────────────────────────────────────────────────────── */
+const A  = "#a038b2";
+const AL = "#f7eefa";
+const AM = "#d4a8e0";
+
+/* ── Inline SVG Icons (no CDN needed) ──────────────────────────────────── */
+const SI = ({ size=16, children }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    {children}
+  </svg>
+);
+const LayoutGrid   = ({size=16}) => <SI size={size}><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></SI>;
+const Music        = ({size=16}) => <SI size={size}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></SI>;
+const FileText     = ({size=16}) => <SI size={size}><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></SI>;
+const CreditCard   = ({size=16}) => <SI size={size}><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></SI>;
+const Shield       = ({size=16}) => <SI size={size}><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></SI>;
+const CheckCircle  = ({size=16}) => <SI size={size}><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></SI>;
+const Clock        = ({size=16}) => <SI size={size}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></SI>;
+const Bell         = ({size=16}) => <SI size={size}><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></SI>;
+const XIco         = ({size=16}) => <SI size={size}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></SI>;
+const ExternalLink = ({size=16}) => <SI size={size}><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></SI>;
+const DollarSign   = ({size=16}) => <SI size={size}><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></SI>;
+const Zap          = ({size=16}) => <SI size={size}><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></SI>;
+const ArrowUpRight = ({size=16}) => <SI size={size}><path d="M7 7h10v10"/><path d="M7 17 17 7"/></SI>;
+const BookOpen     = ({size=16}) => <SI size={size}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></SI>;
+
+/* ── Mock Data ──────────────────────────────────────────────────────────── */
+const STATS = [
+  { label:"Your Works",           value:"3",          sub:"2 active · 1 pending",  icon:Music,       ic:A,         ib:AL        },
+  { label:"Active Royalty Rules", value:"2",          sub:"1 pending approval",     icon:Shield,      ic:"#1a7a50", ib:"#edf7f3" },
+  { label:"Latest Payment",       value:"$842",       sub:"Apr 10, 2025",           icon:DollarSign,  ic:"#b06010", ib:"#fef9ed" },
+  { label:"Proof Status",         value:"3 Verified", sub:"1 in progress",          icon:CheckCircle, ic:"#1a7a50", ib:"#edf7f3" },
+];
+const WORKS = [
+  { id:1, title:"Resonance Vol. 1",          type:"Music Album", registered:"Jan 12, 2025", regStatus:"Registered", ruleStatus:"Active"  },
+  { id:2, title:"The Quiet Hours EP",        type:"Music EP",    registered:"Mar 3, 2025",  regStatus:"Registered", ruleStatus:"Active"  },
+  { id:3, title:"Visual Essay: Urban Drift", type:"Photography", registered:"Apr 1, 2025",  regStatus:"Pending",    ruleStatus:"Pending" },
+];
+const RULES = [
+  { id:1, work:"Resonance Vol. 1",          rate:"12% of net usage revenue", approval:"Approved", published:"Published", since:"Jan 15, 2025" },
+  { id:2, work:"The Quiet Hours EP",        rate:"10% of net usage revenue", approval:"Approved", published:"Published", since:"Mar 5, 2025"  },
+  { id:3, work:"Visual Essay: Urban Drift", rate:"15% of net usage revenue", approval:"Pending",  published:"Pending",  since:"—"            },
+];
+const STEPS = [
+  { id:1, label:"Rule Approved",   desc:"Royalty rule confirmed",   done:true,  date:"Jan 15" },
+  { id:2, label:"Funds Available", desc:"Usage fees collected",     done:true,  date:"Mar 20" },
+  { id:3, label:"Usage Recorded",  desc:"Work usage logged",        done:true,  date:"Apr 1"  },
+  { id:4, label:"Payment Sent",    desc:"Royalty transferred",      done:true,  date:"Apr 10" },
+  { id:5, label:"Proof Saved",     desc:"Immutable record created", done:false, date:null     },
+];
+const HISTORY = [
+  { id:1, date:"Apr 10, 2025", work:"Resonance Vol. 1",   usage:"7,200 streams", amount:"$842.00", status:"Completed" },
+  { id:2, date:"Mar 15, 2025", work:"The Quiet Hours EP", usage:"1,830 streams", amount:"$214.50", status:"Completed" },
+  { id:3, date:"Feb 28, 2025", work:"Resonance Vol. 1",   usage:"5,100 streams", amount:"$598.20", status:"Completed" },
+  { id:4, date:"Feb 1, 2025",  work:"Resonance Vol. 1",   usage:"3,440 streams", amount:"$403.00", status:"Completed" },
+];
+const PROOF = [
+  { id:1, label:"Rule Approved",     desc:"Royalty rule for Resonance Vol. 1 confirmed", date:"Jan 15, 2025", status:"verified", tx:"0x3a9f…c12b" },
+  { id:2, label:"Usage Recorded",    desc:"7,200 streams logged for billing period",      date:"Apr 1, 2025",  status:"verified", tx:"0x7d2e…f89a" },
+  { id:3, label:"Payment Completed", desc:"$842.00 transferred to your account",          date:"Apr 10, 2025", status:"verified", tx:"0x1bc4…290c" },
+  { id:4, label:"Proof Stored",      desc:"Immutable record being finalized",             date:"—",            status:"pending",  tx:null           },
+];
+const ACTIVITY = [
+  { id:1, type:"payment", text:"Payment received for Resonance Vol. 1",               detail:"$842.00", date:"Apr 10" },
+  { id:2, type:"proof",   text:"Proof recorded for March payment cycle",              detail:null,      date:"Apr 5"  },
+  { id:3, type:"payment", text:"Payment received for The Quiet Hours EP",             detail:"$214.50", date:"Mar 15" },
+  { id:4, type:"rule",    text:"Royalty rule approved for The Quiet Hours EP",        detail:null,      date:"Mar 5"  },
+  { id:5, type:"work",    text:"Visual Essay: Urban Drift submitted for registration",detail:null,      date:"Apr 1"  },
+];
+
+/* ── Shared UI ──────────────────────────────────────────────────────────── */
+function Chip({ type }) {
+  const m = {
+    Registered:["#edf7f3","#1a7a50","Registered"],
+    Active:    ["#edf7f3","#1a7a50","Active"],
+    Approved:  ["#edf7f3","#1a7a50","Approved"],
+    Published: ["#edf7f3","#1a7a50","Published"],
+    Completed: ["#edf7f3","#1a7a50","Completed"],
+    verified:  ["#edf7f3","#1a7a50","Verified"],
+    Pending:   ["#fef9ed","#a06010","Pending"],
+    pending:   [AL,A,"In Progress"],
+  };
+  const [bg,color,label] = m[type] || m.Pending;
+  return (
+    <span style={{backgroundColor:bg,color,padding:"2px 10px",borderRadius:9999,fontSize:11,fontWeight:500,whiteSpace:"nowrap",display:"inline-flex",alignItems:"center"}}>
+      {label}
+    </span>
+  );
+}
+function Card({ children, className="" }) {
+  return <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm ${className}`}>{children}</div>;
+}
+function SectionHeader({ title, subtitle }) {
+  return (
+    <div className="mb-4">
+      <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
+      {subtitle && <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{subtitle}</p>}
+    </div>
+  );
+}
+
+/* ── Register Work Modal ─────────────────────────────────────────────────── */
+function RegisterWorkModal({ onClose }) {
+  return (
+    <div onClick={onClose} style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:60,display:"flex",alignItems:"center",justifyContent:"center",backgroundColor:"rgba(0,0,0,0.32)",backdropFilter:"blur(4px)"}}>
+      <div onClick={e=>e.stopPropagation()} style={{backgroundColor:"white",width:"calc(100% - 32px)",maxWidth:420,borderRadius:24,padding:24,boxShadow:"0 25px 50px -12px rgba(0,0,0,0.25)"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:36,height:36,borderRadius:12,backgroundColor:AL,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <Music size={16} style={{color:A}}/>
+            </div>
+            <h3 style={{fontSize:14,fontWeight:700,color:"#111827",margin:0}}>Register a Work</h3>
+          </div>
+          <button onClick={onClose} style={{width:26,height:26,borderRadius:"50%",backgroundColor:"#f3f4f6",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <XIco size={13}/>
+          </button>
+        </div>
+        <p style={{fontSize:13,color:"#6b7280",lineHeight:1.6,marginBottom:20}}>Submit your creative work for royalty tracking. Once registered, you can set royalty rules and start earning from usage.</p>
+        <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
+          {[["Work Title","e.g. Resonance Vol. 2"],["Work Type","e.g. Music Album, Photography"],["Release Date","e.g. May 2025"]].map(([label,ph]) => (
+            <div key={label}>
+              <div style={{fontSize:11,fontWeight:600,color:"#9ca3af",marginBottom:4,textTransform:"uppercase",letterSpacing:"0.04em"}}>{label}</div>
+              <div style={{padding:"10px 12px",borderRadius:10,border:"1px solid #e5e7eb",fontSize:13,color:"#d1d5db",backgroundColor:"#f9fafb"}}>{ph}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{display:"flex",gap:8}}>
+          <button onClick={onClose} style={{flex:1,padding:"11px 0",borderRadius:12,backgroundColor:"#f3f4f6",color:"#6b7280",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>Cancel</button>
+          <button onClick={onClose} style={{flex:2,padding:"11px 0",borderRadius:12,backgroundColor:A,color:"white",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>Submit Registration</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Hero Banner ────────────────────────────────────────────────────────── */
+function HeroBanner({ setTab }) {
+  const [showRegister, setShowRegister] = useState(false);
+  return (
+    <div className="mb-6 rounded-2xl relative overflow-hidden"
+      style={{background:"linear-gradient(135deg,#a038b2 0%,#7420a0 55%,#561680 100%)"}}>
+      <div className="relative p-5 sm:p-6" style={{zIndex:10}}>
+        <div className="text-xs font-medium mb-1" style={{color:"rgba(255,255,255,0.6)"}}>Good morning 👋</div>
+        <div className="text-xl font-bold text-white mb-1.5">Farel Ramadhana</div>
+        <div className="text-sm" style={{color:"rgba(255,255,255,0.72)"}}>
+          3 registered works · 2 active royalty rules · <span className="font-semibold text-white">$1,056.50</span> earned this month
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button onClick={() => setShowRegister(true)} style={{backgroundColor:"rgba(255,255,255,0.18)",color:"white",padding:"6px 14px",borderRadius:12,fontSize:12,fontWeight:600,border:"none",cursor:"pointer"}}>
+            Register a Work
+          </button>
+          <button onClick={() => setTab("payments")} style={{backgroundColor:"white",color:"#7420a0",padding:"6px 14px",borderRadius:12,fontSize:12,fontWeight:600,border:"none",cursor:"pointer"}}>
+            View Payments →
+          </button>
+        </div>
+      </div>
+      {showRegister && <RegisterWorkModal onClose={() => setShowRegister(false)}/>}
+      <div className="absolute rounded-full" style={{width:192,height:192,top:-40,right:-40,backgroundColor:"rgba(255,255,255,0.07)"}}/>
+      <div className="absolute rounded-full" style={{width:112,height:112,bottom:0,right:64,backgroundColor:"rgba(255,255,255,0.05)"}}/>
+      <div className="absolute rounded-full" style={{width:80,height:80,bottom:-16,right:-8,backgroundColor:"rgba(255,255,255,0.06)"}}/>
+    </div>
+  );
+}
+
+/* ── Account Overview ───────────────────────────────────────────────────── */
+function AccountOverview() {
+  return (
+    <section className="mb-7">
+      <SectionHeader title="Account Overview" subtitle="A snapshot of your registered works, rules, and latest earnings." />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {STATS.map((s,i) => {
+          const Icon = s.icon;
+          return (
+            <Card key={i} className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{backgroundColor:s.ib}}>
+                  <Icon size={15} style={{color:s.ic}}/>
+                </div>
+                <ArrowUpRight size={12} className="text-gray-200"/>
+              </div>
+              <div className="text-xl font-bold text-gray-900 leading-none">{s.value}</div>
+              <div className="text-xs font-medium text-gray-700 mt-1.5">{s.label}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{s.sub}</div>
+            </Card>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/* ── My Works ───────────────────────────────────────────────────────────── */
+function MyWorks() {
+  const [selected, setSelected] = useState(null);
+  return (
+    <section className="mb-7">
+      <SectionHeader title="My Works" subtitle="Works you have registered for royalty tracking." />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {WORKS.map(w => {
+          const Icon = w.type.includes("Photo") ? BookOpen : Music;
+          return (
+            <Card key={w.id} className="p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{backgroundColor:AL}}>
+                  <Icon size={16} style={{color:A}}/>
+                </div>
+                <Chip type={w.regStatus}/>
+              </div>
+              <div className="text-sm font-semibold text-gray-900 leading-snug mb-0.5">{w.title}</div>
+              <div className="text-xs text-gray-400 mb-3">{w.type} · Reg. {w.registered}</div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-gray-400">Rule:</span>
+                  <Chip type={w.ruleStatus}/>
+                </div>
+                <button onClick={() => setSelected(w)} style={{color:A,background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600}}>Details →</button>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+      {selected && (
+        <div onClick={() => setSelected(null)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:50,display:"flex",alignItems:"center",justifyContent:"center",backgroundColor:"rgba(0,0,0,0.28)",backdropFilter:"blur(4px)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{backgroundColor:"white",width:"calc(100% - 32px)",maxWidth:420,borderRadius:24,padding:24,boxShadow:"0 25px 50px -12px rgba(0,0,0,0.25)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:36,height:36,borderRadius:12,backgroundColor:AL,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  {selected.type.includes("Photo") ? <BookOpen size={16} style={{color:A}}/> : <Music size={16} style={{color:A}}/>}
+                </div>
+                <h3 style={{fontSize:14,fontWeight:700,color:"#111827",margin:0}}>{selected.title}</h3>
+              </div>
+              <button onClick={() => setSelected(null)} style={{width:26,height:26,borderRadius:"50%",backgroundColor:"#f3f4f6",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIco size={13}/></button>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {[["Work Type",selected.type],["Registration Date",selected.registered],["Registration Status",null],["Royalty Rule",null]].map(([k,v],i) => (
+                <div key={k} style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                  <div>
+                    <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{k}</div>
+                    {v && <div style={{fontSize:13,fontWeight:500,color:"#111827"}}>{v}</div>}
+                  </div>
+                  {i===2 && <Chip type={selected.regStatus}/>}
+                  {i===3 && <Chip type={selected.ruleStatus}/>}
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setSelected(null)} style={{marginTop:16,width:"100%",padding:"11px 0",borderRadius:12,backgroundColor:A,color:"white",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>Close</button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ── Royalty Rules ──────────────────────────────────────────────────────── */
+function RoyaltyRules() {
+  const [selected, setSelected] = useState(null);
+  return (
+    <section className="mb-7">
+      <SectionHeader title="Royalty Rules" subtitle="These rules define how royalty is calculated for each of your works." />
+      <Card>
+        <div className="divide-y divide-gray-50">
+          {RULES.map(r => (
+            <div key={r.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-gray-900">{r.work}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{r.rate}</div>
+                {r.since !== "—" && <div className="text-xs text-gray-400 mt-0.5">In effect since {r.since}</div>}
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Chip type={r.approval}/>
+                <Chip type={r.published}/>
+                <button onClick={() => setSelected(r)} style={{color:A,background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600,marginLeft:4}}>View →</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+      {selected && (
+        <div onClick={() => setSelected(null)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:50,display:"flex",alignItems:"center",justifyContent:"center",backgroundColor:"rgba(0,0,0,0.28)",backdropFilter:"blur(4px)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{backgroundColor:"white",width:"calc(100% - 32px)",maxWidth:420,borderRadius:24,padding:24,boxShadow:"0 25px 50px -12px rgba(0,0,0,0.25)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:36,height:36,borderRadius:12,backgroundColor:"#edf7f3",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <Shield size={16} style={{color:"#1a7a50"}}/>
+                </div>
+                <h3 style={{fontSize:14,fontWeight:700,color:"#111827",margin:0}}>Royalty Rule</h3>
+              </div>
+              <button onClick={() => setSelected(null)} style={{width:26,height:26,borderRadius:"50%",backgroundColor:"#f3f4f6",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIco size={13}/></button>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {[["Work",selected.work,false],["Royalty Rate",selected.rate,false],["In Effect Since",selected.since,false]].map(([k,v]) => (
+                <div key={k} style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
+                  <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{k}</div>
+                  <div style={{fontSize:13,fontWeight:500,color:"#111827"}}>{v}</div>
+                </div>
+              ))}
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{fontSize:11,color:"#9ca3af"}}>Approval Status</div>
+                <Chip type={selected.approval}/>
+              </div>
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{fontSize:11,color:"#9ca3af"}}>Published Status</div>
+                <Chip type={selected.published}/>
+              </div>
+            </div>
+            <button onClick={() => setSelected(null)} style={{marginTop:16,width:"100%",padding:"11px 0",borderRadius:12,backgroundColor:A,color:"white",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>Close</button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ── Payment Progress ───────────────────────────────────────────────────── */
+function PaymentProgress() {
+  return (
+    <section className="mb-7">
+      <SectionHeader title="Payment Progress" subtitle="Track where your latest royalty payment stands right now." />
+      <Card className="p-5 sm:p-6">
+        <div className="flex items-center gap-2 mb-5">
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Resonance Vol. 1</span>
+          <span className="text-gray-300 text-xs">·</span>
+          <span className="text-xs text-gray-400">April 2025 cycle</span>
+          <span className="ml-auto text-xs font-medium"
+            style={{backgroundColor:"#edf7f3",color:"#1a7a50",padding:"2px 10px",borderRadius:9999}}>
+            4 of 5 complete
+          </span>
+        </div>
+        {/* Desktop stepper */}
+        <div className="hidden md:flex items-start relative">
+          <div className="absolute h-px bg-gray-100" style={{top:20,left:20,right:20}}/>
+          <div className="absolute h-px bg-green-400" style={{top:20,left:20,width:"calc(75% - 12px)"}}/>
+          {STEPS.map(step => (
+            <div key={step.id} className="flex flex-col items-center flex-1 px-1" style={{zIndex:10}}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center border-2 mb-2.5"
+                style={{backgroundColor:step.done?"#22c55e":"white",borderColor:step.done?"#22c55e":"#e5e7eb"}}>
+                {step.done
+                  ? <CheckCircle size={17} style={{color:"white"}}/>
+                  : <Clock size={14} style={{color:"#d1d5db"}}/>}
+              </div>
+              <div className="text-center" style={{fontSize:11,fontWeight:600,color:"#1f2937",lineHeight:"1.3"}}>{step.label}</div>
+              <div className="text-center mt-0.5" style={{fontSize:10,color:"#9ca3af",lineHeight:"1.4"}}>{step.desc}</div>
+              {step.date && <div className="mt-1" style={{fontSize:10,color:"#d1d5db"}}>{step.date}</div>}
+            </div>
+          ))}
+        </div>
+        {/* Mobile stepper */}
+        <div className="md:hidden">
+          {STEPS.map((step,i) => (
+            <div key={step.id} className="flex gap-3">
+              <div className="flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center border-2 flex-shrink-0"
+                  style={{backgroundColor:step.done?"#22c55e":"white",borderColor:step.done?"#22c55e":"#e5e7eb"}}>
+                  {step.done
+                    ? <CheckCircle size={14} style={{color:"white"}}/>
+                    : <Clock size={12} style={{color:"#d1d5db"}}/>}
+                </div>
+                {i < STEPS.length-1 && (
+                  <div className="w-px h-7" style={{backgroundColor:step.done?"#86efac":"#f3f4f6"}}/>
+                )}
+              </div>
+              <div className="pb-4 pt-1 min-w-0">
+                <div className="text-sm font-semibold text-gray-800">{step.label}</div>
+                <div className="text-xs text-gray-400">{step.desc}</div>
+                {step.date && <div className="text-xs text-gray-300 mt-0.5">{step.date}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </section>
+  );
+}
+
+/* ── Payment History ────────────────────────────────────────────────────── */
+function PaymentHistory() {
+  const [selected, setSelected] = useState(null);
+  return (
+    <section className="mb-7">
+      <SectionHeader title="Payment History" subtitle="All royalty payments received for your registered works." />
+      {/* Desktop table */}
+      <Card className="hidden md:block overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-50">
+              {["Date","Work","Usage","Received","Status",""].map((h,i) => (
+                <th key={i} className={`px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wide ${i===5?"":"text-left"}`}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {HISTORY.map(p => (
+              <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-5 py-3.5 text-sm text-gray-400">{p.date}</td>
+                <td className="px-5 py-3.5 text-sm font-medium text-gray-900">{p.work}</td>
+                <td className="px-5 py-3.5 text-sm text-gray-500">{p.usage}</td>
+                <td className="px-5 py-3.5 text-sm font-semibold text-gray-900">{p.amount}</td>
+                <td className="px-5 py-3.5"><Chip type={p.status}/></td>
+                <td className="px-5 py-3.5 text-right">
+                  <button onClick={() => setSelected(p)} style={{color:A,background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600}}>View details</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-2.5">
+        {HISTORY.map(p => (
+          <Card key={p.id} className="p-4">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="text-sm font-semibold text-gray-900">{p.work}</div>
+              <Chip type={p.status}/>
+            </div>
+            <div className="text-xs text-gray-400 mb-3">{p.date}</div>
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="text-xs text-gray-400">Usage</div>
+                <div className="text-sm text-gray-700 mt-0.5">{p.usage}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-400">Received</div>
+                <div className="text-sm font-bold text-gray-900 mt-0.5">{p.amount}</div>
+              </div>
+              <button onClick={() => setSelected(p)} style={{color:A,background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600}}>View →</button>
+            </div>
+          </Card>
+        ))}
+      </div>
+      {selected && (
+        <div onClick={() => setSelected(null)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:50,display:"flex",alignItems:"center",justifyContent:"center",backgroundColor:"rgba(0,0,0,0.28)",backdropFilter:"blur(4px)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{backgroundColor:"white",width:"calc(100% - 32px)",maxWidth:420,borderRadius:24,padding:24,boxShadow:"0 25px 50px -12px rgba(0,0,0,0.25)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:36,height:36,borderRadius:12,backgroundColor:"#edf7f3",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  <DollarSign size={16} style={{color:"#1a7a50"}}/>
+                </div>
+                <h3 style={{fontSize:14,fontWeight:700,color:"#111827",margin:0}}>Payment Details</h3>
+              </div>
+              <button onClick={() => setSelected(null)} style={{width:26,height:26,borderRadius:"50%",backgroundColor:"#f3f4f6",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIco size={13}/></button>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {[["Date",selected.date],["Work",selected.work],["Usage",selected.usage],["Amount Received",selected.amount]].map(([k,v]) => (
+                <div key={k} style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
+                  <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{k}</div>
+                  <div style={{fontSize:13,fontWeight:500,color:"#111827"}}>{v}</div>
+                </div>
+              ))}
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{fontSize:11,color:"#9ca3af"}}>Status</div>
+                <Chip type={selected.status}/>
+              </div>
+            </div>
+            <button onClick={() => setSelected(null)} style={{marginTop:16,width:"100%",padding:"11px 0",borderRadius:12,backgroundColor:A,color:"white",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>Close</button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ── Payment Proof ──────────────────────────────────────────────────────── */
+function PaymentProof() {
+  const [modal, setModal] = useState(null);
+  return (
+    <section className="mb-7">
+      <SectionHeader title="Payment Proof"
+        subtitle="Verified records for each stage of your royalty settlement. Click 'Details' to view technical information." />
+      <div className="space-y-2.5">
+        {PROOF.map(item => (
+          <Card key={item.id} className="p-4">
+            <div className="flex items-start sm:items-center justify-between gap-3">
+              <div className="flex items-start sm:items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{backgroundColor:item.status==="verified"?"#edf7f3":AL}}>
+                  {item.status==="verified"
+                    ? <CheckCircle size={16} style={{color:"#1a7a50"}}/>
+                    : <Clock size={16} style={{color:A}}/>}
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-gray-900">{item.label}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{item.desc}</div>
+                  <div className="text-xs text-gray-300 mt-0.5">{item.date}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <Chip type={item.status}/>
+                {item.tx && (
+                  <button
+                    style={{color:A,borderColor:AM,backgroundColor:AL,padding:"5px 12px",borderRadius:8,border:`1px solid ${AM}`,fontSize:12,fontWeight:600,cursor:"pointer"}}
+                    onClick={() => setModal(item)}>
+                    Details
+                  </button>
+                )}
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Modal */}
+      {modal && (
+        <div onClick={() => setModal(null)}
+          style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:50,display:"flex",alignItems:"center",justifyContent:"center",backgroundColor:"rgba(0,0,0,0.28)",backdropFilter:"blur(4px)"}}>
+          <div onClick={e => e.stopPropagation()}
+            style={{backgroundColor:"white",width:"calc(100% - 32px)",maxWidth:448,borderRadius:24,padding:24,boxShadow:"0 25px 50px -12px rgba(0,0,0,0.25)"}}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-sm font-semibold text-gray-900">Technical Details</h3>
+              <button onClick={() => setModal(null)}
+                style={{width:24,height:24,borderRadius:"50%",backgroundColor:"#f3f4f6",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <XIco size={13}/>
+              </button>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {[["Event",modal.label,false],["Date recorded",modal.date,false],["Transaction reference",modal.tx,true],["Storage type","Distributed ledger · Immutable",false]].map(([k,v,mono]) => (
+                <div key={k} style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
+                  <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{k}</div>
+                  <div style={{fontSize:13,fontWeight:500,color:"#111827",fontFamily:mono?"monospace":"inherit"}}>{v}</div>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => window.open("https://explorer.example.com/tx/"+modal.tx, "_blank")} style={{marginTop:16,width:"100%",padding:"11px 0",borderRadius:12,backgroundColor:A,color:"white",fontSize:13,fontWeight:600,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+              <ExternalLink size={13}/> View on explorer
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ── Recent Activity ────────────────────────────────────────────────────── */
+function RecentActivity() {
+  const IC = {
+    payment:{icon:DollarSign,bg:"#edf7f3",c:"#1a7a50"},
+    proof:  {icon:Shield,    bg:AL,       c:A        },
+    rule:   {icon:FileText,  bg:"#fef9ed",c:"#b06010"},
+    work:   {icon:Music,     bg:"#eef3ff",c:"#3060c8"},
+  };
+  return (
+    <section className="mb-7">
+      <SectionHeader title="Recent Activity" subtitle="A log of key events across your works, payments, and proofs." />
+      <Card className="divide-y divide-gray-50">
+        {ACTIVITY.map(item => {
+          const cfg = IC[item.type] || IC.rule;
+          const Icon = cfg.icon;
+          return (
+            <div key={item.id} className="px-4 py-3.5 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{backgroundColor:cfg.bg}}>
+                <Icon size={14} style={{color:cfg.c}}/>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm text-gray-800 leading-snug">{item.text}</div>
+                {item.detail && <div className="text-xs font-semibold mt-0.5" style={{color:A}}>{item.detail}</div>}
+              </div>
+              <div className="text-xs text-gray-300 flex-shrink-0">{item.date}</div>
+            </div>
+          );
+        })}
+      </Card>
+    </section>
+  );
+}
+
+/* ── Navigation ─────────────────────────────────────────────────────────── */
+const NAV = [
+  {id:"overview",label:"Overview",icon:LayoutGrid},
+  {id:"payments",label:"Payments",icon:CreditCard},
+  {id:"proof",   label:"Proof",   icon:Shield    },
+];
+
+function Sidebar({ active, set }) {
+  return (
+    <aside className="hidden lg:flex flex-col bg-white border-r border-gray-100 py-5 px-3"
+      style={{width:224,minHeight:"100vh",flexShrink:0}}>
+      <div className="flex items-center gap-2.5 px-2 mb-7">
+        <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{backgroundColor:A}}>
+          <Zap size={13} style={{color:"white"}}/>
+        </div>
+        <div>
+          <div className="text-sm font-bold text-gray-900 leading-tight">RoyaltyOS</div>
+          <div style={{fontSize:9,color:"#9ca3af",textTransform:"uppercase",letterSpacing:"0.05em"}}>Creator Portal</div>
+        </div>
+      </div>
+      <nav style={{flex:1,display:"flex",flexDirection:"column",gap:2}}>
+        {NAV.map(t => {
+          const Icon = t.icon;
+          const on = active===t.id;
+          return (
+            <button key={t.id} onClick={() => set(t.id)}
+              className="w-full flex items-center gap-2.5 rounded-xl text-sm font-medium"
+              style={{padding:"10px 12px",backgroundColor:on?A:"transparent",color:on?"white":"#6b7280",border:"none",cursor:"pointer",textAlign:"left",transition:"all 0.15s"}}>
+              <Icon size={15}/> {t.label}
+            </button>
+          );
+        })}
+      </nav>
+      <div className="border-t border-gray-100 pt-3.5 mt-3">
+        <div className="flex items-center gap-2.5 px-2">
+          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+            style={{backgroundColor:A,fontSize:10}}>AW</div>
+          <div className="min-w-0">
+            <div className="text-xs font-semibold text-gray-900 truncate">Farel Ramadhana</div>
+            <div className="text-xs text-gray-400">Creator</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function BottomNav({ active, set }) {
+  return (
+    <nav className="lg:hidden"
+      style={{position:"fixed",bottom:0,left:0,right:0,backgroundColor:"white",borderTop:"1px solid #f3f4f6",display:"flex",zIndex:40}}>
+      {NAV.map(t => {
+        const Icon = t.icon;
+        const on = active===t.id;
+        return (
+          <button key={t.id} onClick={() => set(t.id)}
+            style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",padding:"10px 0 8px",gap:3,border:"none",backgroundColor:"transparent",cursor:"pointer"}}>
+            <Icon size={19} style={{color:on?A:"#9ca3af"}}/>
+            <span style={{fontSize:10,fontWeight:500,color:on?A:"#9ca3af"}}>{t.label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+function TopHeader({ active }) {
+  const [showNotif, setShowNotif] = useState(false);
+  const subs = {
+    overview:"Registered works and royalty status",
+    payments:"Track and review your royalty payments",
+    proof:   "Verified settlement records",
+  };
+  const NOTIFS = [
+    {icon:DollarSign, bg:"#edf7f3", c:"#1a7a50", text:"Payment of $842.00 received", sub:"Resonance Vol. 1 · Apr 10"},
+    {icon:Shield,     bg:AL,        c:A,          text:"Proof record verified",        sub:"March payment cycle · Apr 5"},
+    {icon:CheckCircle,bg:"#edf7f3", c:"#1a7a50", text:"Royalty rule approved",        sub:"The Quiet Hours EP · Mar 5"},
+  ];
+  return (
+    <header style={{position:"sticky",top:0,zIndex:30,backgroundColor:"rgba(255,255,255,0.9)",backdropFilter:"blur(12px)",borderBottom:"1px solid #f3f4f6",padding:"12px 20px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <div>
+        <div className="text-sm font-semibold text-gray-900">{NAV.find(t=>t.id===active)?.label}</div>
+        <div className="text-xs text-gray-400 hidden sm:block mt-0.5">{subs[active]}</div>
+      </div>
+      <div className="flex items-center gap-2" style={{position:"relative"}}>
+        <button onClick={() => setShowNotif(v=>!v)} style={{width:28,height:28,borderRadius:10,backgroundColor:showNotif?AL:"#f9fafb",border:showNotif?`1px solid ${AM}`:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
+          <Bell size={14} style={{color:showNotif?A:"#9ca3af"}}/>
+          <span style={{position:"absolute",top:4,right:4,width:6,height:6,borderRadius:"50%",backgroundColor:A,border:"2px solid white"}}/>
+        </button>
+        {showNotif && (
+          <>
+            <div onClick={() => setShowNotif(false)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:40}}/>
+            <div style={{position:"absolute",top:36,right:0,width:300,backgroundColor:"white",borderRadius:16,boxShadow:"0 10px 40px rgba(0,0,0,0.12)",border:"1px solid #f3f4f6",zIndex:50,overflow:"hidden"}}>
+              <div style={{padding:"12px 16px 8px",borderBottom:"1px solid #f9fafb"}}>
+                <div style={{fontSize:12,fontWeight:700,color:"#111827"}}>Notifications</div>
+              </div>
+              {NOTIFS.map((n,i) => {
+                const Icon = n.icon;
+                return (
+                  <div key={i} onClick={() => setShowNotif(false)} style={{display:"flex",alignItems:"center",gap:10,padding:"12px 16px",cursor:"pointer",borderBottom:i<NOTIFS.length-1?"1px solid #f9fafb":"none"}}>
+                    <div style={{width:32,height:32,borderRadius:10,backgroundColor:n.bg,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                      <Icon size={13} style={{color:n.c}}/>
+                    </div>
+                    <div style={{minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:500,color:"#111827",lineHeight:1.3}}>{n.text}</div>
+                      <div style={{fontSize:11,color:"#9ca3af",marginTop:2}}>{n.sub}</div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div style={{padding:"10px 16px",backgroundColor:"#f9fafb",textAlign:"center"}}>
+                <span style={{fontSize:11,color:A,fontWeight:600,cursor:"pointer"}} onClick={() => setShowNotif(false)}>See all activity</span>
+              </div>
+            </div>
+          </>
+        )}
+        <div className="lg:hidden w-7 h-7 rounded-full flex items-center justify-center text-white font-bold"
+          style={{backgroundColor:A,fontSize:10}}>AW</div>
+      </div>
+    </header>
+  );
+}
+
+/* ── App ────────────────────────────────────────────────────────────────── */
+function App() {
+  const [tab, setTab] = useState("overview");
+  return (
+    <div style={{display:"flex",minHeight:"100vh",backgroundColor:"#f5f3f8"}}>
+      <Sidebar active={tab} set={setTab}/>
+      <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
+        <TopHeader active={tab}/>
+        <main style={{flex:1,padding:"16px 16px 96px",overflowY:"auto"}}>
+          <div style={{maxWidth:900,margin:"0 auto"}}>
+            {tab==="overview" && <><HeroBanner setTab={setTab}/><AccountOverview/><MyWorks/><RoyaltyRules/></>}
+            {tab==="payments" && <><PaymentProgress/><PaymentHistory/></>}
+            {tab==="proof"    && <><PaymentProof/><RecentActivity/></>}
+          </div>
+        </main>
+      </div>
+      <BottomNav active={tab} set={setTab}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

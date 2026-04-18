@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RoyaltyOS · Admin Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --a:#a038b2;--a2:#8a2fa0;--al:#f8f0fa;--am:#dba8e8;--a3:#f2e0f7;--a4:#efe2f5;
+  --bg:#f2f1f5;--white:#fff;
+  --g50:#fafaf9;--g100:#f5f4f1;--g150:#edecea;--g200:#e4e2de;--g300:#ccc9c3;
+  --g400:#a8a49c;--g500:#78746c;--g600:#57534e;--g700:#3a3734;--g900:#1a1917;
+  --grn-bg:#edf7f2;--grn:#15643a;--grn-b:#bbf7d0;
+  --amb-bg:#fffaeb;--amb:#92400e;--amb-b:#fde68a;
+  --red-bg:#fef2f2;--red:#991b1b;
+  --blu-bg:#eff6ff;--blu:#1e3fa0;
+  --r10:10px;--r12:12px;--r16:16px;--r20:20px;--r24:24px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 20px rgba(0,0,0,.09),0 1px 4px rgba(0,0,0,.04);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  font-size:14px;color:var(--g700);line-height:1.5;
+}
+body{background:var(--bg);min-height:100vh;display:flex;overflow-x:hidden}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────── */
+.sb{width:214px;min-height:100vh;background:var(--white);border-right:1px solid var(--g200);
+  display:flex;flex-direction:column;padding:18px 10px 20px;flex-shrink:0;
+  position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:9px;padding:4px 8px;margin-bottom:26px}
+.bmark{width:28px;height:28px;border-radius:8px;background:var(--a);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bmark svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round}
+.bname{font-size:14px;font-weight:800;color:var(--g900);letter-spacing:-.02em}
+.bsub{font-size:9px;color:var(--g400);text-transform:uppercase;letter-spacing:.07em;margin-top:1px}
+.ng{font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;
+  letter-spacing:.07em;padding:0 10px;margin:14px 0 5px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--g500);border:none;background:none;
+  width:100%;text-align:left;transition:all .13s}
+.ni:hover{background:var(--g100);color:var(--g700)}
+.ni.active{background:var(--al);color:var(--a);font-weight:600}
+.ni svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.nbadge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+  background:var(--a);color:white;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center}
+.nbadge.a{background:#f59e0b}
+.sbf{margin-top:auto;padding-top:14px;border-top:1px solid var(--g150)}
+.urow{display:flex;align-items:center;gap:9px;padding:6px 8px}
+.av{width:28px;height:28px;border-radius:50%;background:var(--a);color:white;
+  font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.uname{font-size:12px;font-weight:600;color:var(--g900)}
+.urole{font-size:10px;color:var(--g400);margin-top:1px}
+
+/* ── Main ─────────────────────────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* ── Topbar ───────────────────────────────────────────────────────────── */
+.topbar{background:rgba(255,255,255,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--g200);padding:0 26px;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:40;flex-shrink:0}
+.tbl{display:flex;align-items:center;gap:10px}
+.tbtitle{font-size:13.5px;font-weight:600;color:var(--g900)}
+.rbadge{padding:3px 9px;border-radius:999px;background:var(--al);color:var(--a);
+  font-size:10.5px;font-weight:700;border:1px solid var(--am)}
+.sw{display:flex;align-items:center;gap:7px;background:var(--g100);border-radius:9px;
+  padding:5px 11px;border:1px solid var(--g200);transition:all .15s}
+.sw:focus-within{background:white;border-color:var(--am);box-shadow:0 0 0 3px var(--a3)}
+.sw svg{width:13px;height:13px;stroke:var(--g400);fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sw input{border:none;background:none;font-size:12px;color:var(--g700);
+  outline:none;width:170px;font-family:inherit}
+.sw input::placeholder{color:var(--g400)}
+.tbr{display:flex;align-items:center;gap:8px}
+.ibtn{width:30px;height:30px;border-radius:8px;background:var(--g100);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--g500);transition:all .12s;position:relative}
+.ibtn:hover{background:var(--g200);color:var(--g700)}
+.ibtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+.pip::after{content:'';position:absolute;top:5px;right:5px;width:6px;height:6px;
+  background:#ef4444;border-radius:50%;border:1.5px solid white}
+
+/* ── Content ──────────────────────────────────────────────────────────── */
+.cnt{padding:22px 26px 56px;max-width:1100px;width:100%}
+.page{display:none}.page.active{display:block}
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+.hero{border-radius:var(--r20);padding:22px 26px 20px;margin-bottom:22px;
+  position:relative;overflow:hidden;color:white;
+  background:linear-gradient(135deg,#a038b2 0%,#7b229c 48%,#571470 100%)}
+.hero::before{content:'';position:absolute;top:-44px;right:-44px;width:190px;height:190px;
+  border-radius:50%;background:rgba(255,255,255,.07)}
+.hero::after{content:'';position:absolute;bottom:-28px;right:110px;width:130px;height:130px;
+  border-radius:50%;background:rgba(255,255,255,.05)}
+.hero-orb{position:absolute;right:-14px;bottom:-18px;width:96px;height:96px;
+  border-radius:50%;background:rgba(255,255,255,.06)}
+.hi{position:relative;z-index:2}
+.hlbl{font-size:10.5px;font-weight:600;opacity:.6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.htitle{font-size:19px;font-weight:700;letter-spacing:-.02em;margin-bottom:5px;line-height:1.25}
+.hsub{font-size:12.5px;opacity:.72;line-height:1.6;max-width:520px}
+.hacts{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.hbtn{padding:7px 15px;border-radius:10px;font-size:12px;font-weight:600;
+  border:none;cursor:pointer;transition:all .13s}
+.hbtn.p{background:white;color:#7b229c}.hbtn.p:hover{background:#f5f0ff}
+.hbtn.s{background:rgba(255,255,255,.15);color:white}.hbtn.s:hover{background:rgba(255,255,255,.22)}
+.hstats{display:flex;gap:24px;margin-top:18px;flex-wrap:wrap}
+.hsl{font-size:10px;opacity:.6;margin-bottom:2px;font-weight:500}
+.hsv{font-size:17px;font-weight:700;letter-spacing:-.01em}
+
+/* ── Section ──────────────────────────────────────────────────────────── */
+.sec{margin-bottom:26px}
+.shead{margin-bottom:13px;display:flex;align-items:flex-end;
+  justify-content:space-between;gap:10px;flex-wrap:wrap}
+.stitle{font-size:13px;font-weight:700;color:var(--g900);letter-spacing:-.01em}
+.ssub{font-size:11.5px;color:var(--g400);margin-top:2px;line-height:1.5}
+.slink{font-size:12px;font-weight:600;color:var(--a);background:none;border:none;
+  cursor:pointer;white-space:nowrap}
+
+/* ── Card ─────────────────────────────────────────────────────────────── */
+.card{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);box-shadow:var(--sh)}
+.cb{padding:18px 20px}
+
+/* ── Stat grid ────────────────────────────────────────────────────────── */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.scard{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  padding:16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:9px}
+.sico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sico svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sval{font-size:22px;font-weight:700;color:var(--g900);letter-spacing:-.02em;line-height:1}
+.slbl{font-size:11.5px;font-weight:500;color:var(--g600);margin-top:4px}
+.shint{font-size:10.5px;color:var(--g400);margin-top:2px}
+.strend{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;margin-top:3px}
+.strend.up{color:#15803d}.strend.warn{color:#b45309}
+.strend svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Chip ─────────────────────────────────────────────────────────────── */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;
+  font-size:11px;font-weight:600;white-space:nowrap;line-height:1.4}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.chip.grn{background:var(--grn-bg);color:var(--grn)}
+.chip.amb{background:var(--amb-bg);color:var(--amb)}
+.chip.red{background:var(--red-bg);color:var(--red)}
+.chip.pur{background:var(--al);color:var(--a)}
+.chip.blu{background:var(--blu-bg);color:var(--blu)}
+.chip.gry{background:var(--g100);color:var(--g600)}
+
+/* ── Button ───────────────────────────────────────────────────────────── */
+.btn{padding:7px 14px;border-radius:9px;font-size:12px;font-weight:600;border:none;
+  cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:5px}
+.btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn.pr{background:var(--a);color:white}.btn.pr:hover{background:var(--a2)}
+.btn.se{background:var(--g100);color:var(--g600)}.btn.se:hover{background:var(--g200)}
+.btn.gh{background:var(--al);color:var(--a);border:1px solid var(--am)}.btn.gh:hover{background:var(--a3)}
+.btn.sm{padding:5px 11px;font-size:11px;border-radius:8px}
+.btn.full{width:100%;justify-content:center}
+.btn.grn-btn{background:var(--grn-bg);color:var(--grn)}.btn.grn-btn:hover{background:#bbf7d0}
+
+/* ── Layout ───────────────────────────────────────────────────────────── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:start}
+.tcol-wide{display:grid;grid-template-columns:1.55fr 1fr;gap:14px;align-items:start}
+
+/* ── Table ────────────────────────────────────────────────────────────── */
+.twrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--g150)}
+th{padding:10px 16px;text-align:left;font-size:10.5px;font-weight:600;color:var(--g400);
+  text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+td{padding:12px 16px;font-size:12.5px;color:var(--g700);border-bottom:1px solid var(--g100);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--g50)}
+td.bold{font-weight:600;color:var(--g900)}
+td.muted{color:var(--g400);font-size:12px}
+.tlink{color:var(--a);font-weight:600;font-size:12px;background:none;border:none;cursor:pointer;padding:0}
+
+/* ── Role row ─────────────────────────────────────────────────────────── */
+.role-row{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--g100)}
+.role-row:last-child{border-bottom:none}
+.role-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.role-ico svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.role-name{font-size:13px;font-weight:600;color:var(--g900)}
+.role-meta{font-size:11px;color:var(--g400);margin-top:1px}
+.role-acts{display:flex;gap:6px;margin-left:auto;flex-shrink:0}
+
+/* ── Queue card ───────────────────────────────────────────────────────── */
+.qcard{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  padding:16px 18px;box-shadow:var(--sh);cursor:pointer;transition:all .15s;
+  border-left:3px solid transparent}
+.qcard:hover{box-shadow:var(--sh2);transform:translateY(-1px)}
+.qcard.ready{border-left-color:var(--a)}
+.qcard.urgent{border-left-color:#f59e0b}
+.qcard.done{border-left-color:#22c55e}
+.qc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.qc-title{font-size:13px;font-weight:700;color:var(--g900);line-height:1.3}
+.qc-meta{font-size:11px;color:var(--g400);margin-top:2px}
+.qc-fields{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px;margin-bottom:11px}
+.qfl{font-size:10px;color:var(--g400);font-weight:500;margin-bottom:1px}
+.qfv{font-size:12px;font-weight:500;color:var(--g700)}
+.qc-acts{display:flex;gap:6px}
+
+/* ── Activity feed ────────────────────────────────────────────────────── */
+.feed-item{display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--g100)}
+.feed-item:last-child{border-bottom:none}
+.fdot{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fdot svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ftext{flex:1;font-size:12.5px;color:var(--g700);line-height:1.45}
+.ftext strong{color:var(--g900);font-weight:600}
+.ftime{font-size:10.5px;color:var(--g400);white-space:nowrap}
+
+/* ── Contract status card ─────────────────────────────────────────────── */
+.csc{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  box-shadow:var(--sh);overflow:hidden}
+.csc-head{padding:14px 18px 12px;border-bottom:1px solid var(--g150);
+  display:flex;align-items:center;justify-content:space-between}
+.csc-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.csc-ico svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.csc-name{font-size:12.5px;font-weight:700;color:var(--g900);margin-top:8px;margin-bottom:2px;padding:0 18px}
+.csc-rows{padding:6px 0 4px}
+.csc-row{display:flex;justify-content:space-between;align-items:center;padding:6px 18px}
+.csc-key{font-size:11px;color:var(--g400)}
+.csc-val{font-size:11.5px;font-weight:500;color:var(--g700)}
+.csc-val.mono{font-family:'SF Mono','Menlo',monospace;font-size:10px;color:var(--g500)}
+.csc-foot{padding:10px 18px;border-top:1px solid var(--g150)}
+
+/* ── Audit summary ────────────────────────────────────────────────────── */
+.audit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.ag-item{background:var(--g50);border-radius:12px;border:1px solid var(--g150);
+  padding:14px 16px;text-align:center}
+.ag-val{font-size:22px;font-weight:700;color:var(--g900);letter-spacing:-.02em;line-height:1}
+.ag-lbl{font-size:11px;color:var(--g500);margin-top:4px;font-weight:500}
+
+/* ── Progress bar ─────────────────────────────────────────────────────── */
+.pbar{height:5px;border-radius:3px;background:var(--g150);overflow:hidden;margin-top:6px}
+.pfill{height:100%;border-radius:3px;background:var(--a)}
+
+/* ── Timeline ─────────────────────────────────────────────────────────── */
+.tl-item{display:flex;gap:13px;padding-bottom:16px;position:relative}
+.tl-item:last-child{padding-bottom:0}
+.tl-col{display:flex;flex-direction:column;align-items:center;width:26px;flex-shrink:0}
+.tl-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;z-index:1;flex-shrink:0}
+.tl-dot svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tl-dot.grn-d{background:var(--grn-bg);color:var(--grn)}
+.tl-dot.pur-d{background:var(--al);color:var(--a)}
+.tl-dot.amb-d{background:var(--amb-bg);color:var(--amb)}
+.tl-dot.blu-d{background:var(--blu-bg);color:var(--blu)}
+.tl-line{flex:1;width:1px;background:var(--g200);margin-top:4px}
+.tl-body{flex:1;min-width:0;padding-top:2px}
+.tl-title{font-size:12.5px;font-weight:600;color:var(--g900)}
+.tl-desc{font-size:11.5px;color:var(--g500);margin-top:2px;line-height:1.5}
+.tl-time{font-size:10.5px;color:var(--g400);margin-top:2px}
+
+/* ── Modal ────────────────────────────────────────────────────────────── */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.22);
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  z-index:100;display:none;align-items:flex-end;justify-content:center}
+.moverlay.open{display:flex}
+@media(min-width:600px){.moverlay{align-items:center;padding:20px}}
+.modal{background:white;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;
+  border-radius:var(--r24) var(--r24) 0 0;box-shadow:0 24px 64px rgba(0,0,0,.16)}
+@media(min-width:600px){.modal{border-radius:var(--r24)}}
+.mhead{padding:18px 20px 14px;border-bottom:1px solid var(--g100);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:white;z-index:2;border-radius:var(--r24) var(--r24) 0 0}
+@media(min-width:600px){.mhead{border-radius:var(--r24) var(--r24) 0 0}}
+.mtitle{font-size:14px;font-weight:700;color:var(--g900)}
+.mclose{width:26px;height:26px;border-radius:8px;background:var(--g100);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g500)}
+.mclose svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.mbody{padding:16px 20px 22px}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.kv{background:var(--g50);border-radius:9px;padding:10px 12px;border:1px solid var(--g100)}
+.kvk{font-size:10px;color:var(--g400);font-weight:500;margin-bottom:2px;text-transform:uppercase;letter-spacing:.04em}
+.kvv{font-size:12.5px;font-weight:600;color:var(--g900)}
+.mbox{background:var(--g50);border-radius:8px;padding:10px 12px;
+  font-family:'SF Mono','Menlo',monospace;font-size:10.5px;color:var(--g500);
+  word-break:break-all;border:1px solid var(--g150);line-height:1.6;margin-top:4px}
+.mfl{font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:5px}
+
+/* ── Bottom nav ───────────────────────────────────────────────────────── */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:white;
+  border-top:1px solid var(--g200);z-index:40;
+  padding-bottom:env(safe-area-inset-bottom,0)}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:9px 0 7px;background:none;border:none;cursor:pointer;
+  color:var(--g400);font-size:10px;font-weight:500;gap:3px;transition:color .12s}
+.bni.active{color:var(--a)}
+.bni svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Tab strip ────────────────────────────────────────────────────────── */
+.tstrip{display:flex;gap:2px;background:var(--g100);border-radius:10px;
+  padding:3px;width:fit-content;margin-bottom:16px}
+.tab{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;color:var(--g500);
+  border:none;background:none;cursor:pointer;transition:all .13s}
+.tab.active{background:white;color:var(--g900);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media(max-width:960px){.sgrid{grid-template-columns:repeat(2,1fr)}.three{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){
+  .sb{display:none}.cnt{padding:14px 14px 80px}
+  .two{grid-template-columns:1fr}.three{grid-template-columns:1fr}
+  .tcol-wide{grid-template-columns:1fr}
+  .bnav{display:flex}.topbar{padding:0 14px}
+  .sw{display:none}.sgrid{grid-template-columns:1fr 1fr}
+  .audit-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){.sgrid{grid-template-columns:1fr 1fr}.audit-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ══════════════════════════════════════════════════════════ -->
+<aside class="sb">
+  <div class="brand">
+    <div class="bmark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <div><div class="bname">RoyaltyOS</div><div class="bsub">Admin Portal</div></div>
+  </div>
+
+  <span class="ng">Workspace</span>
+  <button class="ni active" onclick="navTo('overview',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Overview
+  </button>
+  <button class="ni" onclick="navTo('management',this)">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    Management
+    <span class="nbadge a">8</span>
+  </button>
+  <button class="ni" onclick="navTo('monitoring',this)">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Monitoring
+  </button>
+
+  <span class="ng">System</span>
+  <button class="ni" onclick="navTo('settings',this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Settings
+  </button>
+
+  <div class="sbf">
+    <div class="urow">
+      <div class="av">SA</div>
+      <div><div class="uname">System Admin</div><div class="urole">Administrator</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="tbl">
+      <div class="tbtitle" id="tb-title">Overview</div>
+      <span class="rbadge">Admin</span>
+    </div>
+    <div class="sw">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search works, roles, rules…"/>
+    </div>
+    <div class="tbr">
+      <button class="ibtn pip" title="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <div class="av" style="cursor:pointer">SA</div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="cnt">
+
+    <!-- ══════════════ PAGE: OVERVIEW ══════════════════════════════════════ -->
+    <div class="page active" id="page-overview">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hi">
+          <div class="hlbl">RoyaltyOS · Admin Dashboard</div>
+          <div class="htitle">Keep the royalty system running clearly</div>
+          <div class="hsub">Manage access, publish approved rules, and monitor settlement activity across the platform.</div>
+          <div class="hacts">
+            <button class="hbtn p" onclick="navTo('management',document.querySelector('[onclick*=management]'))">Open Publication Queue</button>
+            <button class="hbtn s" onclick="navTo('monitoring',document.querySelector('[onclick*=monitoring]'))">View System Activity</button>
+          </div>
+          <div class="hstats">
+            <div><div class="hsl">Roles Active</div><div class="hsv">4</div></div>
+            <div><div class="hsl">Rules Ready</div><div class="hsv">8</div></div>
+            <div><div class="hsl">Payments Processed</div><div class="hsv">24</div></div>
+          </div>
+        </div>
+        <div class="hero-orb"></div>
+      </div>
+
+      <!-- System Overview stats -->
+      <div class="sec">
+        <div class="shead">
+          <div>
+            <div class="stitle">System Overview</div>
+            <div class="ssub">Manage access, publish approved rules, and monitor activity across the royalty system.</div>
+          </div>
+        </div>
+        <div class="sgrid">
+          <div class="scard">
+            <div class="sico" style="background:#f8f0fa;color:#a038b2">
+              <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </div>
+            <div>
+              <div class="sval">47</div>
+              <div class="slbl">Registered Works</div>
+              <div class="shint">3 added this week</div>
+            </div>
+            <div class="strend up">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              +6.4% this month
+            </div>
+          </div>
+          <div class="scard">
+            <div class="sico" style="background:#edf7f2;color:#15803d">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="sval">31</div>
+              <div class="slbl">Active Royalty Rules</div>
+              <div class="shint">8 awaiting publication</div>
+            </div>
+            <div class="strend up">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              All validated
+            </div>
+          </div>
+          <div class="scard">
+            <div class="sico" style="background:#fffaeb;color:#92400e">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <div>
+              <div class="sval">$84.2k</div>
+              <div class="slbl">Payments Processed</div>
+              <div class="shint">24 transactions total</div>
+            </div>
+            <div class="strend up">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              +18% this month
+            </div>
+          </div>
+          <div class="scard">
+            <div class="sico" style="background:#eff6ff;color:#1e3fa0">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+            </div>
+            <div>
+              <div class="sval">138</div>
+              <div class="slbl">Audit Records</div>
+              <div class="shint">2 flagged for review</div>
+            </div>
+            <div class="strend warn">
+              <svg viewBox="0 0 24 24"><polyline points="18 9 12 15 6 9"/></svg>
+              2 items need attention
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two col: Quick queue preview + Activity -->
+      <div class="two">
+
+        <!-- Publication queue preview -->
+        <div class="sec">
+          <div class="shead">
+            <div><div class="stitle">Publication Queue</div><div class="ssub">Rules ready to go live.</div></div>
+            <button class="slink" onclick="navTo('management',document.querySelector('[onclick*=management]'))">See all →</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="qcard ready">
+              <div class="qc-top">
+                <div><div class="qc-title">Resonance Vol. 1</div><div class="qc-meta">Amara Wijaya · Music Album</div></div>
+                <span class="chip pur">Ready to Publish</span>
+              </div>
+              <div class="qc-fields">
+                <div><div class="qfl">Rate</div><div class="qfv">12% net revenue</div></div>
+                <div><div class="qfl">Approvals</div><div class="qfv">3 of 3</div></div>
+              </div>
+              <div class="qc-acts">
+                <button class="btn pr sm" onclick="openModal('modal-publish','Resonance Vol. 1')">
+                  <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                  Publish Now
+                </button>
+                <button class="btn se sm" onclick="openModal('modal-ruledetail','Resonance Vol. 1')">View Rule</button>
+              </div>
+            </div>
+            <div class="qcard urgent">
+              <div class="qc-top">
+                <div><div class="qc-title">The Quiet Hours EP</div><div class="qc-meta">Amara Wijaya · Music EP</div></div>
+                <span class="chip amb">Needs Approval</span>
+              </div>
+              <div class="qc-fields">
+                <div><div class="qfl">Rate</div><div class="qfv">10% net revenue</div></div>
+                <div><div class="qfl">Approvals</div><div class="qfv">2 of 3</div></div>
+              </div>
+              <div class="qc-acts">
+                <button class="btn se sm" onclick="openModal('modal-ruledetail','The Quiet Hours EP')">View Approval Status</button>
+              </div>
+            </div>
+            <div class="qcard done">
+              <div class="qc-top">
+                <div><div class="qc-title">Night Market Series</div><div class="qc-meta">Budi Santoso · Photography</div></div>
+                <span class="chip grn">Already Active</span>
+              </div>
+              <div class="qc-fields">
+                <div><div class="qfl">Rate</div><div class="qfv">8% net revenue</div></div>
+                <div><div class="qfl">Published</div><div class="qfv">Apr 9, 2025</div></div>
+              </div>
+              <div class="qc-acts">
+                <button class="btn se sm" onclick="openModal('modal-ruledetail','Night Market Series')">View Details</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Activity preview -->
+        <div class="sec">
+          <div class="shead">
+            <div><div class="stitle">System Activity</div><div class="ssub">Recent platform events.</div></div>
+            <button class="slink" onclick="navTo('monitoring',document.querySelector('[onclick*=monitoring]'))">Full log →</button>
+          </div>
+          <div class="card">
+            <div class="feed-item">
+              <div class="fdot" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="ftext"><strong>Payment completed</strong> · Resonance Vol. 1 — $842.00</div>
+              <div class="ftime">Apr 10</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#f8f0fa;color:#a038b2"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div>
+              <div class="ftext"><strong>Rule published</strong> · Night Market Series rule activated</div>
+              <div class="ftime">Apr 9</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#eff6ff;color:#1e3fa0"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+              <div class="ftext"><strong>Role granted</strong> · Validator access assigned to Rizal V.</div>
+              <div class="ftime">Apr 8</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <div class="ftext"><strong>Audit record saved</strong> · April bundle stored</div>
+              <div class="ftime">Apr 8</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#fffaeb;color:#92400e"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              <div class="ftext"><strong>Rule proposed</strong> · Urban Drift Photography submitted</div>
+              <div class="ftime">Apr 7</div>
+            </div>
+            <div class="feed-item">
+              <div class="fdot" style="background:#edf7f2;color:#15803d"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="ftext"><strong>Rule approved</strong> · Echoes of Spring by Rizal V.</div>
+              <div class="ftime">Apr 6</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contract status -->
+      <div class="sec">
+        <div class="shead">
+          <div><div class="stitle">Contracts and Status</div><div class="ssub">High-level health of the major system components.</div></div>
+        </div>
+        <div class="three" style="grid-template-columns:repeat(4,1fr)">
+
+          <div class="csc">
+            <div class="csc-head">
+              <div class="csc-ico" style="background:#f8f0fa;color:#a038b2">
+                <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/></svg>
+              </div>
+              <span class="chip grn">Active</span>
+            </div>
+            <div class="csc-name">Asset Registry</div>
+            <div class="csc-rows">
+              <div class="csc-row"><span class="csc-key">Connection</span><span class="csc-val">Online</span></div>
+              <div class="csc-row"><span class="csc-key">Last update</span><span class="csc-val">Apr 11</span></div>
+              <div class="csc-row"><span class="csc-key">Reference</span><span class="csc-val mono">AR-001</span></div>
+            </div>
+            <div class="csc-foot"><button class="btn se sm full" onclick="openModal('modal-contract','Asset Registry')">View Details</button></div>
+          </div>
+
+          <div class="csc">
+            <div class="csc-head">
+              <div class="csc-ico" style="background:#edf7f2;color:#15803d">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <span class="chip grn">Active</span>
+            </div>
+            <div class="csc-name">Royalty Rules</div>
+            <div class="csc-rows">
+              <div class="csc-row"><span class="csc-key">Connection</span><span class="csc-val">Online</span></div>
+              <div class="csc-row"><span class="csc-key">Last update</span><span class="csc-val">Apr 9</span></div>
+              <div class="csc-row"><span class="csc-key">Reference</span><span class="csc-val mono">RR-007</span></div>
+            </div>
+            <div class="csc-foot"><button class="btn se sm full" onclick="openModal('modal-contract','Royalty Rules')">View Details</button></div>
+          </div>
+
+          <div class="csc">
+            <div class="csc-head">
+              <div class="csc-ico" style="background:#fffaeb;color:#92400e">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              </div>
+              <span class="chip amb">Syncing</span>
+            </div>
+            <div class="csc-name">Payment Engine</div>
+            <div class="csc-rows">
+              <div class="csc-row"><span class="csc-key">Connection</span><span class="csc-val">Syncing…</span></div>
+              <div class="csc-row"><span class="csc-key">Last update</span><span class="csc-val">Apr 10</span></div>
+              <div class="csc-row"><span class="csc-key">Reference</span><span class="csc-val mono">PE-003</span></div>
+            </div>
+            <div class="csc-foot"><button class="btn se sm full" onclick="openModal('modal-contract','Payment Engine')">View Details</button></div>
+          </div>
+
+          <div class="csc">
+            <div class="csc-head">
+              <div class="csc-ico" style="background:#eff6ff;color:#1e3fa0">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <span class="chip grn">Active</span>
+            </div>
+            <div class="csc-name">Audit Records</div>
+            <div class="csc-rows">
+              <div class="csc-row"><span class="csc-key">Connection</span><span class="csc-val">Online</span></div>
+              <div class="csc-row"><span class="csc-key">Last update</span><span class="csc-val">Apr 11</span></div>
+              <div class="csc-row"><span class="csc-key">Reference</span><span class="csc-val mono">AU-012</span></div>
+            </div>
+            <div class="csc-foot"><button class="btn se sm full" onclick="openModal('modal-contract','Audit Records')">View Details</button></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /overview -->
+
+
+    <!-- ══════════════ PAGE: MANAGEMENT ════════════════════════════════════ -->
+    <div class="page" id="page-management">
+
+      <!-- Account Roles -->
+      <div class="sec">
+        <div class="shead">
+          <div><div class="stitle">Account Roles</div><div class="ssub">Platform roles and their current access status.</div></div>
+          <button class="btn pr sm" onclick="openModal('modal-assignrole',null)">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Assign Role
+          </button>
+        </div>
+        <div class="card">
+          <div class="role-row">
+            <div class="role-ico" style="background:#f8f0fa;color:#a038b2">
+              <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/></svg>
+            </div>
+            <div>
+              <div class="role-name">Creators</div>
+              <div class="role-meta">12 accounts · Can register works and set royalty rules</div>
+            </div>
+            <span class="chip grn">Active</span>
+            <div class="role-acts">
+              <button class="btn se sm" onclick="openModal('modal-viewaccount','Creators')">View Accounts</button>
+              <button class="btn gh sm" onclick="openModal('modal-updateaccess','Creators')">Update Access</button>
+            </div>
+          </div>
+          <div class="role-row">
+            <div class="role-ico" style="background:#edf7f2;color:#15803d">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div>
+              <div class="role-name">Validators</div>
+              <div class="role-meta">5 accounts · Review and approve royalty rules</div>
+            </div>
+            <span class="chip grn">Active</span>
+            <div class="role-acts">
+              <button class="btn se sm" onclick="openModal('modal-viewaccount','Validators')">View Accounts</button>
+              <button class="btn gh sm" onclick="openModal('modal-updateaccess','Validators')">Update Access</button>
+            </div>
+          </div>
+          <div class="role-row">
+            <div class="role-ico" style="background:#eff6ff;color:#1e3fa0">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div>
+              <div class="role-name">DSP / Reporters</div>
+              <div class="role-meta">8 accounts · Submit usage and manage payments</div>
+            </div>
+            <span class="chip grn">Active</span>
+            <div class="role-acts">
+              <button class="btn se sm" onclick="openModal('modal-viewaccount','DSP / Reporters')">View Accounts</button>
+              <button class="btn gh sm" onclick="openModal('modal-updateaccess','DSP / Reporters')">Update Access</button>
+            </div>
+          </div>
+          <div class="role-row">
+            <div class="role-ico" style="background:#fffaeb;color:#92400e">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            </div>
+            <div>
+              <div class="role-name">Admin</div>
+              <div class="role-meta">1 account · Full system access</div>
+            </div>
+            <span class="chip pur">Admin</span>
+            <div class="role-acts">
+              <button class="btn se sm" onclick="openModal('modal-viewaccount','Admin')">View Account</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Published Rules table -->
+      <div class="sec">
+        <div class="shead">
+          <div><div class="stitle">Published Rules</div><div class="ssub">Royalty rules currently active or near activation.</div></div>
+          <div class="tstrip">
+            <button class="tab active" onclick="filterRules('all',this)">All</button>
+            <button class="tab" onclick="filterRules('active',this)">Active</button>
+            <button class="tab" onclick="filterRules('ready',this)">Ready</button>
+            <button class="tab" onclick="filterRules('pending',this)">Pending</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="twrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Work</th><th>Creator</th><th>Rate</th><th>Status</th><th>Approvals</th><th>Published</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="rules-tbody">
+                <tr data-rstat="active"><td class="bold">Resonance Vol. 1</td><td>Amara Wijaya</td><td>12%</td><td><span class="chip grn">Already Active</span></td><td>3 / 3</td><td class="muted">Jan 15</td><td><button class="tlink" onclick="openModal('modal-ruledetail','Resonance Vol. 1')">Details</button></td></tr>
+                <tr data-rstat="active"><td class="bold">The Quiet Hours EP</td><td>Amara Wijaya</td><td>10%</td><td><span class="chip grn">Already Active</span></td><td>3 / 3</td><td class="muted">Mar 5</td><td><button class="tlink" onclick="openModal('modal-ruledetail','The Quiet Hours EP')">Details</button></td></tr>
+                <tr data-rstat="ready"><td class="bold">Echoes of Spring</td><td>Citra Dewi</td><td>9%</td><td><span class="chip pur">Ready to Publish</span></td><td>3 / 3</td><td class="muted">—</td><td><button class="btn pr sm" onclick="openModal('modal-publish','Echoes of Spring')">Publish</button></td></tr>
+                <tr data-rstat="ready"><td class="bold">Coastal Frames</td><td>Sari Nuraini</td><td>11%</td><td><span class="chip pur">Ready to Publish</span></td><td>3 / 3</td><td class="muted">—</td><td><button class="btn pr sm" onclick="openModal('modal-publish','Coastal Frames')">Publish</button></td></tr>
+                <tr data-rstat="pending"><td class="bold">Urban Drift Photography</td><td>Sari Nuraini</td><td>15%</td><td><span class="chip amb">Needs More Approval</span></td><td>1 / 3</td><td class="muted">—</td><td><button class="tlink" onclick="openModal('modal-ruledetail','Urban Drift Photography')">Details</button></td></tr>
+                <tr data-rstat="pending"><td class="bold">Solar Frequencies</td><td>Dewi Rahayu</td><td>13%</td><td><span class="chip amb">Needs More Approval</span></td><td>2 / 3</td><td class="muted">—</td><td><button class="tlink" onclick="openModal('modal-ruledetail','Solar Frequencies')">Details</button></td></tr>
+                <tr data-rstat="active"><td class="bold">Night Market Series</td><td>Budi Santoso</td><td>8%</td><td><span class="chip grn">Already Active</span></td><td>3 / 3</td><td class="muted">Apr 9</td><td><button class="tlink" onclick="openModal('modal-ruledetail','Night Market Series')">Details</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rule Publication Queue full -->
+      <div class="sec">
+        <div class="shead">
+          <div><div class="stitle">Rule Publication Queue</div><div class="ssub">Rules waiting to go live. Publish when ready.</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="queue-full">
+
+          <div class="qcard ready">
+            <div class="qc-top">
+              <div><div class="qc-title">Resonance Vol. 1</div><div class="qc-meta">Music Album · Amara Wijaya</div></div>
+              <span class="chip pur">Ready</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qfl">Rate</div><div class="qfv">12% net revenue</div></div>
+              <div><div class="qfl">Approvals</div><div class="qfv">3 of 3</div></div>
+              <div><div class="qfl">Submitted</div><div class="qfv">Jan 12</div></div>
+              <div><div class="qfl">Type</div><div class="qfv">Music</div></div>
+            </div>
+            <div style="margin-bottom:10px">
+              <div style="font-size:10px;color:var(--g400);margin-bottom:3px">Approval progress</div>
+              <div class="pbar"><div class="pfill" style="width:100%"></div></div>
+            </div>
+            <div class="qc-acts">
+              <button class="btn pr sm" onclick="openModal('modal-publish','Resonance Vol. 1')">
+                <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Publish Now
+              </button>
+              <button class="btn se sm" onclick="openModal('modal-ruledetail','Resonance Vol. 1')">Open Rule</button>
+            </div>
+          </div>
+
+          <div class="qcard ready">
+            <div class="qc-top">
+              <div><div class="qc-title">Echoes of Spring</div><div class="qc-meta">Music · Citra Dewi</div></div>
+              <span class="chip pur">Ready</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qfl">Rate</div><div class="qfv">9% net revenue</div></div>
+              <div><div class="qfl">Approvals</div><div class="qfv">3 of 3</div></div>
+              <div><div class="qfl">Submitted</div><div class="qfv">Apr 6</div></div>
+              <div><div class="qfl">Type</div><div class="qfv">Music</div></div>
+            </div>
+            <div style="margin-bottom:10px">
+              <div style="font-size:10px;color:var(--g400);margin-bottom:3px">Approval progress</div>
+              <div class="pbar"><div class="pfill" style="width:100%"></div></div>
+            </div>
+            <div class="qc-acts">
+              <button class="btn pr sm" onclick="openModal('modal-publish','Echoes of Spring')">
+                <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Publish Now
+              </button>
+              <button class="btn se sm" onclick="openModal('modal-ruledetail','Echoes of Spring')">Open Rule</button>
+            </div>
+          </div>
+
+          <div class="qcard urgent">
+            <div class="qc-top">
+              <div><div class="qc-title">Solar Frequencies</div><div class="qc-meta">Music · Dewi Rahayu</div></div>
+              <span class="chip amb">Pending</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qfl">Rate</div><div class="qfv">13% net revenue</div></div>
+              <div><div class="qfl">Approvals</div><div class="qfv">2 of 3</div></div>
+              <div><div class="qfl">Submitted</div><div class="qfv">Apr 7</div></div>
+              <div><div class="qfl">Type</div><div class="qfv">Music</div></div>
+            </div>
+            <div style="margin-bottom:10px">
+              <div style="font-size:10px;color:var(--g400);margin-bottom:3px">Approval progress</div>
+              <div class="pbar"><div class="pfill" style="width:66%"></div></div>
+            </div>
+            <div class="qc-acts">
+              <button class="btn se sm" onclick="openModal('modal-ruledetail','Solar Frequencies')">View Approval Status</button>
+            </div>
+          </div>
+
+          <div class="qcard urgent">
+            <div class="qc-top">
+              <div><div class="qc-title">Urban Drift Photography</div><div class="qc-meta">Photography · Sari Nuraini</div></div>
+              <span class="chip amb">Pending</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qfl">Rate</div><div class="qfv">15% net revenue</div></div>
+              <div><div class="qfl">Approvals</div><div class="qfv">1 of 3</div></div>
+              <div><div class="qfl">Submitted</div><div class="qfv">Apr 1</div></div>
+              <div><div class="qfl">Type</div><div class="qfv">Photography</div></div>
+            </div>
+            <div style="margin-bottom:10px">
+              <div style="font-size:10px;color:var(--g400);margin-bottom:3px">Approval progress</div>
+              <div class="pbar"><div class="pfill" style="width:33%"></div></div>
+            </div>
+            <div class="qc-acts">
+              <button class="btn se sm" onclick="openModal('modal-ruledetail','Urban Drift Photography')">View Approval Status</button>
+            </div>
+          </div>
+
+          <div class="qcard done">
+            <div class="qc-top">
+              <div><div class="qc-title">Night Market Series</div><div class="qc-meta">Photography · Budi Santoso</div></div>
+              <span class="chip grn">Published</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qfl">Rate</div><div class="qfv">8% net revenue</div></div>
+              <div><div class="qfl">Approvals</div><div class="qfv">3 of 3</div></div>
+              <div><div class="qfl">Published</div><div class="qfv">Apr 9, 2025</div></div>
+              <div><div class="qfl">Type</div><div class="qfv">Photography</div></div>
+            </div>
+            <div style="margin-bottom:10px">
+              <div style="font-size:10px;color:var(--g400);margin-bottom:3px">Approval progress</div>
+              <div class="pbar"><div class="pfill" style="width:100%;background:#22c55e"></div></div>
+            </div>
+            <div class="qc-acts">
+              <button class="btn se sm" onclick="openModal('modal-ruledetail','Night Market Series')">View Details</button>
+            </div>
+          </div>
+
+          <div class="qcard ready">
+            <div class="qc-top">
+              <div><div class="qc-title">Coastal Frames</div><div class="qc-meta">Photography · Sari Nuraini</div></div>
+              <span class="chip pur">Ready</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qfl">Rate</div><div class="qfv">11% net revenue</div></div>
+              <div><div class="qfl">Approvals</div><div class="qfv">3 of 3</div></div>
+              <div><div class="qfl">Submitted</div><div class="qfv">Apr 5</div></div>
+              <div><div class="qfl">Type</div><div class="qfv">Photography</div></div>
+            </div>
+            <div style="margin-bottom:10px">
+              <div style="font-size:10px;color:var(--g400);margin-bottom:3px">Approval progress</div>
+              <div class="pbar"><div class="pfill" style="width:100%"></div></div>
+            </div>
+            <div class="qc-acts">
+              <button class="btn pr sm" onclick="openModal('modal-publish','Coastal Frames')">
+                <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                Publish Now
+              </button>
+              <button class="btn se sm" onclick="openModal('modal-ruledetail','Coastal Frames')">Open Rule</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /management -->
+
+
+    <!-- ══════════════ PAGE: MONITORING ════════════════════════════════════ -->
+    <div class="page" id="page-monitoring">
+
+      <!-- Audit Summary -->
+      <div class="sec">
+        <div class="shead">
+          <div><div class="stitle">Audit Summary</div><div class="ssub">Proof and audit readiness across the platform.</div></div>
+          <button class="btn se sm" onclick="openModal('modal-auditdetail',null)">View Summary</button>
+        </div>
+        <div class="card cb">
+          <div class="audit-grid">
+            <div class="ag-item"><div class="ag-val">138</div><div class="ag-lbl">Proof Records Saved</div></div>
+            <div class="ag-item"><div class="ag-val">12</div><div class="ag-lbl">Audit Bundles</div></div>
+            <div class="ag-item"><div class="ag-val">24</div><div class="ag-lbl">Review-Ready Items</div></div>
+            <div class="ag-item" style="border:1px solid #fde68a;background:#fffaeb">
+              <div class="ag-val" style="color:#92400e">2</div>
+              <div class="ag-lbl" style="color:#b45309">Flagged Items</div>
+            </div>
+          </div>
+          <div class="two" style="gap:10px;margin-top:4px">
+            <button class="btn gh full" onclick="openModal('modal-auditdetail',null)">Open Records</button>
+            <button class="btn se full" onclick="openModal('modal-auditdetail',null)">View Summary</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Activity Log -->
+      <div class="sec">
+        <div class="shead">
+          <div><div class="stitle">System Activity Log</div><div class="ssub">All platform events in chronological order.</div></div>
+        </div>
+        <div class="two">
+          <div class="card" style="padding:20px">
+            <div style="font-size:12.5px;font-weight:700;color:var(--g900);margin-bottom:14px">April 2025</div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot grn-d"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-line"></div></div>
+              <div class="tl-body"><div class="tl-title">Payment completed — Resonance Vol. 1</div><div class="tl-desc">$842.00 disbursed to Amara Wijaya</div><div class="tl-time">Apr 10, 2025 · 09:05</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot blu-d"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="tl-line"></div></div>
+              <div class="tl-body"><div class="tl-title">Audit record saved — April bundle</div><div class="tl-desc">Metro Sounds DSP · 3 works covered</div><div class="tl-time">Apr 11, 2025 · 10:22</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot pur-d"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div><div class="tl-line"></div></div>
+              <div class="tl-body"><div class="tl-title">Rule published — Night Market Series</div><div class="tl-desc">Published by Admin · Rule now active</div><div class="tl-time">Apr 9, 2025 · 14:11</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot blu-d"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="tl-line"></div></div>
+              <div class="tl-body"><div class="tl-title">Role granted — Validator access</div><div class="tl-desc">Rizal Valentino assigned Validator role</div><div class="tl-time">Apr 8, 2025 · 11:30</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot grn-d"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-line"></div></div>
+              <div class="tl-body"><div class="tl-title">Rule approved — Echoes of Spring</div><div class="tl-desc">Validated by Rizal Valentino</div><div class="tl-time">Apr 6, 2025 · 16:45</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot amb-d"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></div>
+              <div class="tl-body"><div class="tl-title">Rule proposed — Urban Drift Photography</div><div class="tl-desc">Submitted by Sari Nuraini · Awaiting review</div><div class="tl-time">Apr 7, 2025 · 09:14</div></div>
+            </div>
+          </div>
+          <div class="card" style="padding:20px">
+            <div style="font-size:12.5px;font-weight:700;color:var(--g900);margin-bottom:14px">March 2025</div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot grn-d"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-line"></div></div>
+              <div class="tl-body"><div class="tl-title">Payment completed — The Quiet Hours EP</div><div class="tl-desc">$214.50 disbursed to Amara Wijaya</div><div class="tl-time">Mar 15, 2025 · 13:40</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot pur-d"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></div><div class="tl-line"></div></div>
+              <div class="tl-body"><div class="tl-title">Rule published — The Quiet Hours EP</div><div class="tl-desc">Published by Admin · Rule now active</div><div class="tl-time">Mar 5, 2025 · 10:02</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot grn-d"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-line"></div></div>
+              <div class="tl-body"><div class="tl-title">Rule approved — Quiet Hours EP</div><div class="tl-desc">Full validator consensus reached</div><div class="tl-time">Mar 3, 2025 · 15:20</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot blu-d"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="tl-line"></div></div>
+              <div class="tl-body"><div class="tl-title">Audit bundle saved — March cycle</div><div class="tl-desc">Metro Sounds DSP · 2 works covered</div><div class="tl-time">Mar 31, 2025 · 17:55</div></div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-col"><div class="tl-dot pur-d"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/></svg></div></div>
+              <div class="tl-body"><div class="tl-title">Work registered — Coastal Frames</div><div class="tl-desc">Sari Nuraini · Photography set added</div><div class="tl-time">Mar 20, 2025 · 08:30</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /monitoring -->
+
+
+    <!-- ══════════════ PAGE: SETTINGS ═══════════════════════════════════════ -->
+    <div class="page" id="page-settings">
+      <div class="sec">
+        <div class="shead"><div><div class="stitle">Settings</div><div class="ssub">System preferences and account management.</div></div></div>
+        <div class="card cb" style="max-width:520px">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">System Name</label>
+              <input style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none" value="RoyaltyOS Royalty System"/>
+            </div>
+            <div>
+              <label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Admin Email</label>
+              <input style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none" value="admin@RoyaltyOS.io"/>
+            </div>
+            <div>
+              <label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Required Validator Approvals</label>
+              <select style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none;appearance:none">
+                <option>3 (current)</option><option>2</option><option>4</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Notifications</label>
+              <select style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none;appearance:none">
+                <option>Email + In-app</option><option>In-app only</option>
+              </select>
+            </div>
+            <button class="btn pr" onclick="alert('Settings saved.')">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /settings -->
+
+  </div><!-- /cnt -->
+</div><!-- /main -->
+
+<!-- Bottom nav -->
+<nav class="bnav">
+  <button class="bni active" onclick="navTo('overview',this,true)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Overview
+  </button>
+  <button class="bni" onclick="navTo('management',this,true)">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    Manage
+  </button>
+  <button class="bni" onclick="navTo('monitoring',this,true)">
+    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Monitor
+  </button>
+  <button class="bni" onclick="navTo('settings',this,true)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+
+<!-- ═══ MODALS ══════════════════════════════════════════════════════════════ -->
+
+<!-- Publish modal -->
+<div class="moverlay" id="modal-publish">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle" id="modal-publish-title">Publish Rule</div>
+      <button class="mclose" onclick="closeModal('modal-publish')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="kv-grid">
+        <div class="kv"><div class="kvk">Creator</div><div class="kvv">Amara Wijaya</div></div>
+        <div class="kv"><div class="kvk">Rate</div><div class="kvv">12% net revenue</div></div>
+        <div class="kv"><div class="kvk">Approvals</div><div class="kvv">3 of 3</div></div>
+        <div class="kv"><div class="kvk">Work type</div><div class="kvv">Music Album</div></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="mfl">Compliance</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g700)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>All 3 validators approved</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g700)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Rate within allowed range</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g700)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>No conflicting rules found</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--g500);margin-bottom:16px;line-height:1.6">Publishing this rule will make it active immediately. The creator will be notified and usage tracking will begin from today.</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn pr full" onclick="alert('Rule published successfully! It is now active.');closeModal('modal-publish')">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          Confirm Publication
+        </button>
+        <button class="btn se" onclick="closeModal('modal-publish')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rule detail modal -->
+<div class="moverlay" id="modal-ruledetail">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle" id="modal-ruledetail-title">Rule Details</div>
+      <button class="mclose" onclick="closeModal('modal-ruledetail')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="kv-grid">
+        <div class="kv"><div class="kvk">Creator</div><div class="kvv">Amara Wijaya</div></div>
+        <div class="kv"><div class="kvk">Rate</div><div class="kvv">12% net revenue</div></div>
+        <div class="kv"><div class="kvk">Status</div><div class="kvv" style="color:#a038b2">Ready to Publish</div></div>
+        <div class="kv"><div class="kvk">Submitted</div><div class="kvv">Jan 12, 2025</div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div class="mfl">Rule Summary</div>
+        <p style="font-size:12.5px;color:var(--g700);line-height:1.6">Royalty calculated as 12% of net streaming revenue after platform fees, applied per billing cycle. Trigger: monthly.</p>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="mfl">Approval Status</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--g700);padding:7px 10px;background:var(--g50);border-radius:8px">
+            <span>Rizal Valentino</span><span class="chip grn">Approved · Apr 6</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--g700);padding:7px 10px;background:var(--g50);border-radius:8px">
+            <span>Sinta Maharani</span><span class="chip grn">Approved · Apr 7</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--g700);padding:7px 10px;background:var(--g50);border-radius:8px">
+            <span>Doni Prakasa</span><span class="chip grn">Approved · Apr 8</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div class="mfl">Technical Reference</div>
+        <div class="mbox">rule_id: RL-2025-001-AW · ref: 0x3a9f4d2e…c12b</div>
+      </div>
+      <button class="btn pr full" onclick="closeModal('modal-ruledetail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Assign role modal -->
+<div class="moverlay" id="modal-assignrole">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle">Assign Role</div>
+      <button class="mclose" onclick="closeModal('modal-assignrole')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div><label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Account Name or Email</label><input style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none" placeholder="e.g. name@example.com"/></div>
+        <div><label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Assign Role</label>
+          <select style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none;appearance:none">
+            <option>Creator</option><option>Validator</option><option>DSP / Reporter</option>
+          </select>
+        </div>
+        <div><label style="font-size:10.5px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Note (optional)</label><textarea style="width:100%;padding:9px 12px;border-radius:9px;border:1px solid var(--g200);background:var(--g50);font-size:13px;color:var(--g900);font-family:inherit;outline:none;resize:vertical;min-height:64px" placeholder="Reason for assignment…"></textarea></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn pr full" onclick="alert('Role assigned successfully.');closeModal('modal-assignrole')">Confirm Assignment</button>
+        <button class="btn se" onclick="closeModal('modal-assignrole')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View account modal -->
+<div class="moverlay" id="modal-viewaccount">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle" id="modal-viewaccount-title">Accounts</div>
+      <button class="mclose" onclick="closeModal('modal-viewaccount')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="kv" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="kvk">Name</div><div class="kvv">Amara Wijaya</div></div>
+          <span class="chip grn">Active</span>
+        </div>
+        <div class="kv" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="kvk">Name</div><div class="kvv">Budi Santoso</div></div>
+          <span class="chip grn">Active</span>
+        </div>
+        <div class="kv" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="kvk">Name</div><div class="kvv">Citra Dewi</div></div>
+          <span class="chip grn">Active</span>
+        </div>
+        <div class="kv" style="display:flex;align-items:center;justify-content:space-between">
+          <div><div class="kvk">Name</div><div class="kvv">Sari Nuraini</div></div>
+          <span class="chip amb">Pending</span>
+        </div>
+      </div>
+      <button class="btn se full" style="margin-top:14px" onclick="closeModal('modal-viewaccount')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update access modal -->
+<div class="moverlay" id="modal-updateaccess">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle" id="modal-updateaccess-title">Update Access</div>
+      <button class="mclose" onclick="closeModal('modal-updateaccess')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <p style="font-size:12.5px;color:var(--g600);line-height:1.6;margin-bottom:16px">Select an account to modify access permissions or change role status.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--g50);border-radius:10px;border:1px solid var(--g150)">
+          <span style="font-size:12.5px;font-weight:500;color:var(--g900)">Amara Wijaya</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn se sm">Suspend</button>
+            <button class="btn gh sm">Edit</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--g50);border-radius:10px;border:1px solid var(--g150)">
+          <span style="font-size:12.5px;font-weight:500;color:var(--g900)">Budi Santoso</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn se sm">Suspend</button>
+            <button class="btn gh sm">Edit</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn se full" onclick="closeModal('modal-updateaccess')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Contract detail modal -->
+<div class="moverlay" id="modal-contract">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle" id="modal-contract-title">Component Details</div>
+      <button class="mclose" onclick="closeModal('modal-contract')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="kv-grid">
+        <div class="kv"><div class="kvk">Status</div><div class="kvv" style="color:#15803d">Active</div></div>
+        <div class="kv"><div class="kvk">Connection</div><div class="kvv">Online</div></div>
+        <div class="kv"><div class="kvk">Last Updated</div><div class="kvv">Apr 11, 2025</div></div>
+        <div class="kv"><div class="kvk">Version</div><div class="kvv">v2.1.4</div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div class="mfl">System Reference</div>
+        <div class="mbox">component_id: AR-001 · hash: 0xf8a2b1c4d9e6f3a2b1c4d9e6f3a2b1c4d9e6f3a2b1c4d9e6f3a2</div>
+      </div>
+      <p style="font-size:12px;color:var(--g500);line-height:1.6;margin-bottom:16px">This component is operating normally. No action required at this time. Last health check: 2 minutes ago.</p>
+      <button class="btn se full" onclick="closeModal('modal-contract')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Audit detail modal -->
+<div class="moverlay" id="modal-auditdetail">
+  <div class="modal">
+    <div class="mhead">
+      <div class="mtitle">Audit Summary</div>
+      <button class="mclose" onclick="closeModal('modal-auditdetail')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="mbody">
+      <div class="kv-grid">
+        <div class="kv"><div class="kvk">Proof Records</div><div class="kvv">138</div></div>
+        <div class="kv"><div class="kvk">Audit Bundles</div><div class="kvv">12</div></div>
+        <div class="kv"><div class="kvk">Review Ready</div><div class="kvv">24</div></div>
+        <div class="kv"><div class="kvk">Flagged</div><div class="kvv" style="color:#92400e">2</div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div class="mfl">Flagged Items</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--g700);padding:8px 12px;background:#fffaeb;border-radius:9px;border:1px solid var(--amb-b)">
+            <span>Solar Frequencies — rate anomaly detected</span><span class="chip amb">Review</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--g700);padding:8px 12px;background:#fffaeb;border-radius:9px;border:1px solid var(--amb-b)">
+            <span>Midnight Canopy — missing usage data</span><span class="chip amb">Review</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn se full" onclick="closeModal('modal-auditdetail')">Close</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ── Navigation ────────────────────────────────────────────────────────── */
+const titles = {
+  overview:'Overview', management:'Management',
+  monitoring:'Monitoring', settings:'Settings'
+};
+function navTo(id, el, mobile) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('tb-title').textContent = titles[id] || id;
+  if (mobile) {
+    document.querySelectorAll('.bni').forEach(n => n.classList.remove('active'));
+  } else {
+    document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  }
+  if (el) el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── Modals ─────────────────────────────────────────────────────────────── */
+function openModal(id, label) {
+  const el = document.getElementById(id);
+  const t  = document.getElementById(id + '-title');
+  if (t && label) t.textContent = label;
+  el.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.moverlay').forEach(o => {
+  o.addEventListener('click', function(e) {
+    if (e.target === this) { this.classList.remove('open'); document.body.style.overflow = ''; }
+  });
+});
+
+/* ── Rules filter ───────────────────────────────────────────────────────── */
+function filterRules(type, btn) {
+  document.querySelectorAll('.tstrip .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#rules-tbody tr').forEach(r => {
+    r.style.display = (type === 'all' || r.dataset.rstat === type) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

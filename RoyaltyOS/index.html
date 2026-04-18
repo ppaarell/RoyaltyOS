@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoyaltyOS · Sign In</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --a: #a038b2;
+      --a2: #8a2fa0;
+      --al: #f8f0fa;
+      --a3: #f2e0f7;
+      --bg: #f2f1f5;
+      --white: #ffffff;
+      --g100: #f5f4f1;
+      --g150: #edecea;
+      --g200: #e4e2de;
+      --g300: #ccc9c3;
+      --g400: #a8a49c;
+      --g500: #78746c;
+      --g700: #3a3734;
+      --g900: #1a1917;
+      --shadow: 0 18px 44px rgba(0,0,0,.10), 0 3px 12px rgba(0,0,0,.05);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    }
+
+    html, body {
+      min-height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, rgba(160,56,178,.10), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(160,56,178,.05), transparent 20%),
+        var(--bg);
+      color: var(--g700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .window {
+      width: 100%;
+      max-width: 1040px;
+      min-height: 640px;
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .showcase {
+      position: relative;
+      padding: 28px 32px;
+      background: linear-gradient(135deg, #a038b2 0%, #7b229c 48%, #571470 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .showcase::before {
+      content: "";
+      position: absolute;
+      top: -78px;
+      right: -78px;
+      width: 240px;
+      height: 240px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.07);
+    }
+
+    .showcase::after {
+      content: "";
+      position: absolute;
+      bottom: -36px;
+      right: 72px;
+      width: 136px;
+      height: 136px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+    }
+
+    .traffic {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .traffic span {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+    }
+
+    .brand {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-mark svg {
+      width: 18px;
+      height: 18px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .brand-name {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+    }
+
+    .showcase-copy {
+      position: relative;
+      z-index: 2;
+      max-width: 420px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: rgba(255,255,255,.65);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 38px;
+      line-height: 1.04;
+      letter-spacing: -.05em;
+      margin-bottom: 14px;
+    }
+
+    .showcase-copy p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: rgba(255,255,255,.76);
+    }
+
+    .prototype-note {
+      position: relative;
+      z-index: 2;
+      align-self: flex-start;
+      margin-top: 28px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.12);
+      font-size: 12px;
+      color: rgba(255,255,255,.86);
+    }
+
+    .login-side {
+      padding: 34px 32px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: rgba(255,255,255,.82);
+    }
+
+    .login-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--g400);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 10px;
+    }
+
+    .login-title {
+      font-size: 30px;
+      line-height: 1.08;
+      letter-spacing: -.05em;
+      color: var(--g900);
+      margin-bottom: 10px;
+    }
+
+    .login-sub {
+      font-size: 13px;
+      color: var(--g500);
+      line-height: 1.7;
+      max-width: 360px;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--g500);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1px solid var(--g200);
+      background: var(--g100);
+      border-radius: 15px;
+      padding: 13px 14px;
+      font-size: 14px;
+      color: var(--g900);
+      outline: none;
+      transition: .16s ease;
+      font-family: inherit;
+    }
+
+    .field input:focus {
+      background: var(--white);
+      border-color: var(--a);
+      box-shadow: 0 0 0 4px var(--a3);
+    }
+
+    .field input::placeholder {
+      color: var(--g400);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 15px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .16s ease;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary {
+      background: var(--a);
+      color: #fff;
+      min-width: 150px;
+    }
+
+    .btn-primary:hover {
+      background: var(--a2);
+    }
+
+    .btn-secondary {
+      background: var(--al);
+      color: var(--a);
+      border: 1px solid #e5c9eb;
+    }
+
+    .btn-secondary:hover {
+      background: var(--a3);
+    }
+
+    .message {
+      min-height: 22px;
+      font-size: 12px;
+      margin-top: 4px;
+      color: #b42318;
+      font-weight: 600;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 11px;
+      color: var(--g400);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 920px) {
+      .window {
+        grid-template-columns: 1fr;
+        max-width: 620px;
+      }
+      .showcase,
+      .login-side {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 14px;
+      }
+      .window {
+        border-radius: 24px;
+      }
+      .showcase,
+      .login-side {
+        padding: 22px 18px;
+      }
+      h1 {
+        font-size: 30px;
+      }
+      .login-title {
+        font-size: 24px;
+      }
+      .actions {
+        flex-direction: column;
+      }
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <section class="showcase">
+      <div>
+        <div class="traffic">
+          <span class="red"></span>
+          <span class="yellow"></span>
+          <span class="green"></span>
+        </div>
+
+        <div class="brand">
+          <div class="brand-mark">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="brand-name">RoyaltyOS</div>
+        </div>
+
+        <div class="showcase-copy">
+          <div class="eyebrow">Prototype access</div>
+          <h1>Sign in to continue.</h1>
+          <p>
+            Prototype for a rights-aware royalty settlement platform.
+          </p>
+        </div>
+      </div>
+
+      <div class="prototype-note">Prototype access for demonstration only.</div>
+    </section>
+
+    <section class="login-side">
+      <div class="login-kicker">Secure access</div>
+      <div class="login-title">Welcome back to RoyaltyOS</div>
+      <div class="login-sub">
+        Enter your username and password to open the assigned workspace.
+      </div>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" placeholder="Enter username" required />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" placeholder="Enter password" required />
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-primary">Sign In</button>
+          <button type="button" class="btn btn-secondary" id="clearBtn">Clear</button>
+        </div>
+
+        <div class="message" id="message"></div>
+      </form>
+
+      <div class="footer-note">Prototype environment.</div>
+    </section>
+  </div>
+
+  <script>
+const USERS = [
+  { username: "admin", password: "admin123", role: "admin" },
+  { username: "creator", password: "creator123", role: "creator" },
+  { username: "validator", password: "validator123", role: "validator" },
+  { username: "dsp", password: "dsp123", role: "dsp" },
+  { username: "auditor", password: "auditor123", role: "auditor" }
+];
+
+const ROLE_ROUTES = {
+  admin: "/admin/",
+  creator: "/creator/",
+  validator: "/validator/",
+  dsp: "/dsp/",
+  auditor: "/auditor/"
+};
+
+function loginUser(username, password) {
+  return USERS.find(
+    u => u.username === username && u.password === password
+  ) || null;
+}
+
+document.getElementById("loginForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const errorMsg = document.getElementById("errorMsg");
+
+  const user = loginUser(username, password);
+
+  if (!user) {
+    errorMsg.textContent = "Invalid username or password.";
+    return;
+  }
+
+  localStorage.setItem("royaltyosUser", JSON.stringify(user));
+  window.location.href = ROLE_ROUTES[user.role];
+});
+</script>
+</body>
+</html>

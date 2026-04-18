@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RoyaltyOS · Validator Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --a:#7c3aed;--al:#f5f0ff;--am:#c4b5fd;--a2:#6d28d9;
+  --bg:#f4f3f7;--white:#ffffff;
+  --g50:#fafaf9;--g100:#f4f3f0;--g200:#e8e6e1;--g300:#d1cec7;
+  --g400:#a8a49c;--g500:#78746c;--g600:#57534e;--g700:#3a3734;--g900:#1a1917;
+  --green-bg:#edf7f2;--green:#166534;--green-b:#bbf7d0;
+  --amber-bg:#fffbeb;--amber:#92400e;--amber-b:#fde68a;
+  --red-bg:#fef2f2;--red:#991b1b;--red-b:#fecaca;
+  --blue-bg:#eff6ff;--blue:#1e40af;--blue-b:#bfdbfe;
+  --r12:12px;--r16:16px;--r20:20px;--r24:24px;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  font-size:14px;color:var(--g700);line-height:1.5;
+}
+body{background:var(--bg);min-height:100vh;display:flex}
+
+/* ── Sidebar ─────────────────────────────────────── */
+.sidebar{width:220px;min-height:100vh;background:var(--white);border-right:1px solid var(--g200);
+  display:flex;flex-direction:column;padding:20px 12px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:4px 8px;margin-bottom:28px}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:var(--a);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.logo-name{font-size:13px;font-weight:700;color:var(--g900);letter-spacing:-.01em}
+.logo-sub{font-size:9px;color:var(--g400);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+.nav-label{font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.07em;padding:0 10px;margin-bottom:6px;margin-top:16px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--g500);border:none;background:none;width:100%;text-align:left;transition:all .13s}
+.nav-item:hover{background:var(--g100);color:var(--g700)}
+.nav-item.active{background:var(--al);color:var(--a);font-weight:600}
+.nav-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.nav-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+  background:var(--a);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.nav-badge.amber{background:#f59e0b}
+.sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid var(--g200)}
+.avatar-row{display:flex;align-items:center;gap:9px;padding:6px 8px}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--a);color:white;
+  font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.avatar-name{font-size:12px;font-weight:600;color:var(--g900)}
+.avatar-role{font-size:10px;color:var(--g400);margin-top:1px}
+
+/* ── Main ────────────────────────────────────────── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-x:hidden}
+.topbar{background:rgba(255,255,255,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--g200);padding:0 28px;height:52px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:30;flex-shrink:0}
+.topbar-title{font-size:14px;font-weight:600;color:var(--g900)}
+.topbar-sub{font-size:11px;color:var(--g400);margin-top:1px}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.icon-btn{width:30px;height:30px;border-radius:8px;background:var(--g100);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--g500);transition:all .12s}
+.icon-btn:hover{background:var(--g200);color:var(--g700)}
+.icon-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.notif-dot{position:relative}
+.notif-dot::after{content:'';position:absolute;top:6px;right:6px;width:6px;height:6px;background:#ef4444;border-radius:50%;border:1.5px solid white}
+
+/* ── Page content ────────────────────────────────── */
+.content{padding:24px 28px 48px;max-width:1060px;width:100%}
+.page{display:none}
+.page.active{display:block}
+
+/* ── Section ─────────────────────────────────────── */
+.section{margin-bottom:28px}
+.section-head{margin-bottom:14px}
+.section-title{font-size:13px;font-weight:700;color:var(--g900);letter-spacing:-.01em}
+.section-sub{font-size:11.5px;color:var(--g400);margin-top:2px;line-height:1.5}
+
+/* ── Stat cards ──────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat-card{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  padding:16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px}
+.stat-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.stat-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.stat-value{font-size:22px;font-weight:700;color:var(--g900);letter-spacing:-.02em;line-height:1}
+.stat-label{font-size:11.5px;font-weight:500;color:var(--g600);margin-top:4px}
+.stat-sub{font-size:10.5px;color:var(--g400);margin-top:2px}
+.stat-trend{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;margin-top:4px}
+.stat-trend.up{color:#16a34a}.stat-trend.warn{color:#d97706}
+.stat-trend svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Hero banner ─────────────────────────────────── */
+.hero-banner{background:linear-gradient(135deg,#7c3aed 0%,#5b21b6 52%,#4c1d95 100%);
+  border-radius:var(--r20);padding:22px 24px;margin-bottom:20px;position:relative;overflow:hidden;color:white}
+.hero-banner::before{content:'';position:absolute;top:-32px;right:-32px;width:160px;height:160px;
+  border-radius:50%;background:rgba(255,255,255,.07)}
+.hero-banner::after{content:'';position:absolute;bottom:-20px;right:80px;width:100px;height:100px;
+  border-radius:50%;background:rgba(255,255,255,.05)}
+.hero-greeting{font-size:11px;font-weight:500;opacity:.65;margin-bottom:4px}
+.hero-name{font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+.hero-meta{font-size:12px;opacity:.7;line-height:1.6}
+.hero-meta strong{color:white;font-weight:600;opacity:1}
+.hero-actions{display:flex;gap:8px;margin-top:16px;position:relative;z-index:2}
+.hero-btn{padding:7px 14px;border-radius:10px;font-size:12px;font-weight:600;
+  border:none;cursor:pointer;transition:all .13s}
+.hero-btn.primary{background:white;color:#5b21b6}
+.hero-btn.secondary{background:rgba(255,255,255,.16);color:white}
+.hero-orb{position:absolute;right:-10px;bottom:-10px;width:80px;height:80px;
+  border-radius:50%;background:rgba(255,255,255,.06)}
+
+/* ── Card ────────────────────────────────────────── */
+.card{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);box-shadow:var(--sh)}
+.card-body{padding:18px 20px}
+.card-divider{border:none;border-top:1px solid var(--g100)}
+
+/* ── Chip ────────────────────────────────────────── */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;
+  font-size:11px;font-weight:600;white-space:nowrap;line-height:1.4}
+.chip.green{background:var(--green-bg);color:var(--green)}
+.chip.amber{background:var(--amber-bg);color:var(--amber)}
+.chip.red{background:var(--red-bg);color:var(--red)}
+.chip.blue{background:var(--blue-bg);color:var(--blue)}
+.chip.purple{background:var(--al);color:var(--a)}
+.chip.gray{background:var(--g100);color:var(--g600)}
+.chip::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+
+/* ── Table ───────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--g100)}
+th{padding:10px 16px;text-align:left;font-size:10.5px;font-weight:600;color:var(--g400);
+  text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+td{padding:13px 16px;font-size:12.5px;color:var(--g700);border-bottom:1px solid var(--g100);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .1s}
+tbody tr:hover{background:var(--g50)}
+td.mono{font-family:'SF Mono','Menlo',monospace;font-size:11px;color:var(--g500)}
+td.bold{font-weight:600;color:var(--g900)}
+td.muted{color:var(--g400);font-size:12px}
+.tbl-action{color:var(--a);font-weight:600;font-size:12px;background:none;border:none;cursor:pointer;padding:0}
+
+/* ── Pill row ────────────────────────────────────── */
+.pill-row{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ── Queue cards ─────────────────────────────────── */
+.queue-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.queue-card{background:var(--white);border-radius:var(--r16);border:1px solid var(--g200);
+  padding:16px 18px;box-shadow:var(--sh);transition:box-shadow .15s,transform .15s;cursor:pointer}
+.queue-card:hover{box-shadow:var(--sh2);transform:translateY(-1px)}
+.queue-card.urgent{border-left:3px solid #f59e0b}
+.queue-card.normal{border-left:3px solid var(--am)}
+.qc-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px}
+.qc-title{font-size:13px;font-weight:700;color:var(--g900);line-height:1.3}
+.qc-meta{font-size:11px;color:var(--g400);margin-top:3px}
+.qc-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-bottom:12px}
+.qc-field-label{font-size:10px;color:var(--g400);font-weight:500;margin-bottom:1px}
+.qc-field-value{font-size:12px;font-weight:500;color:var(--g700)}
+.qc-actions{display:flex;gap:6px}
+.btn{padding:7px 14px;border-radius:9px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;gap:5px}
+.btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn.primary{background:var(--a);color:white}
+.btn.primary:hover{background:var(--a2)}
+.btn.secondary{background:var(--g100);color:var(--g600)}
+.btn.secondary:hover{background:var(--g200)}
+.btn.approve{background:#dcfce7;color:#166534}
+.btn.approve:hover{background:#bbf7d0}
+.btn.reject{background:var(--red-bg);color:var(--red)}
+.btn.reject:hover{background:#fecaca}
+.btn.sm{padding:5px 11px;font-size:11px}
+
+/* ── Timeline ────────────────────────────────────── */
+.timeline{padding:4px 0}
+.tl-item{display:flex;gap:14px;padding-bottom:20px;position:relative}
+.tl-item:last-child{padding-bottom:0}
+.tl-item:not(:last-child) .tl-dot-col::after{content:'';position:absolute;left:14px;top:28px;
+  bottom:0;width:1px;background:var(--g200)}
+.tl-dot-col{position:relative;display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0}
+.tl-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1;flex-shrink:0}
+.tl-dot svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tl-dot.done{background:#dcfce7;color:#16a34a}
+.tl-dot.pending{background:var(--amber-bg);color:#d97706}
+.tl-dot.info{background:var(--blue-bg);color:var(--blue)}
+.tl-dot.purple{background:var(--al);color:var(--a)}
+.tl-body{flex:1;min-width:0;padding-top:3px}
+.tl-title{font-size:12.5px;font-weight:600;color:var(--g900)}
+.tl-desc{font-size:11.5px;color:var(--g500);margin-top:2px;line-height:1.5}
+.tl-time{font-size:10.5px;color:var(--g400);margin-top:3px}
+
+/* ── Progress bar ────────────────────────────────── */
+.prog-bar{height:6px;border-radius:3px;background:var(--g200);overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;border-radius:3px;background:var(--a);transition:width .4s}
+
+/* ── Proof chain ─────────────────────────────────── */
+.proof-chain{display:flex;flex-direction:column;gap:10px}
+.proof-item{background:var(--g50);border-radius:12px;border:1px solid var(--g200);padding:14px 16px;
+  display:flex;align-items:center;gap:14px}
+.proof-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.proof-icon svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.proof-label{font-size:12.5px;font-weight:600;color:var(--g900)}
+.proof-desc{font-size:11px;color:var(--g500);margin-top:2px}
+.proof-tx{font-family:'SF Mono','Menlo',monospace;font-size:10px;color:var(--g400);margin-top:3px}
+.proof-btn{margin-left:auto;padding:5px 12px;border-radius:8px;border:1px solid var(--am);
+  background:var(--al);color:var(--a);font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0}
+
+/* ── Validation detail modal ─────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);backdrop-filter:blur(4px);
+  z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:white;border-radius:var(--r24);width:100%;max-width:500px;max-height:88vh;
+  overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.16)}
+.modal-head{padding:20px 22px 16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;z-index:2;border-radius:var(--r24) var(--r24) 0 0}
+.modal-title{font-size:14px;font-weight:700;color:var(--g900)}
+.modal-close{width:26px;height:26px;border-radius:8px;background:var(--g100);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--g500)}
+.modal-close svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.modal-body{padding:18px 22px 22px}
+.modal-field{margin-bottom:12px}
+.modal-field-label{font-size:10.5px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.modal-field-value{font-size:13px;font-weight:500;color:var(--g900)}
+.modal-field-value.mono{font-family:'SF Mono','Menlo',monospace;font-size:11px;background:var(--g100);
+  padding:8px 10px;border-radius:8px;color:var(--g600);word-break:break-all}
+.modal-actions{display:flex;gap:8px;margin-top:18px}
+.modal-actions .btn{flex:1;justify-content:center}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.kv-item{background:var(--g50);border-radius:10px;padding:10px 12px;border:1px solid var(--g100)}
+.kv-key{font-size:10px;color:var(--g400);font-weight:500;margin-bottom:2px}
+.kv-val{font-size:12.5px;font-weight:600;color:var(--g900)}
+
+/* ── Activity feed ───────────────────────────────── */
+.feed-item{display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--g100)}
+.feed-item:last-child{border-bottom:none}
+.feed-dot{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.feed-dot svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.feed-text{flex:1;font-size:12.5px;color:var(--g700);line-height:1.4}
+.feed-text strong{color:var(--g900);font-weight:600}
+.feed-time{font-size:10.5px;color:var(--g400);white-space:nowrap}
+
+/* ── Tab strip ───────────────────────────────────── */
+.tab-strip{display:flex;gap:2px;background:var(--g100);border-radius:10px;padding:3px;margin-bottom:16px;width:fit-content}
+.tab{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;color:var(--g500);
+  border:none;background:none;cursor:pointer;transition:all .13s}
+.tab.active{background:white;color:var(--g900);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* ── Empty state ─────────────────────────────────── */
+.empty-state{padding:40px 20px;text-align:center;color:var(--g400)}
+.empty-state-icon{font-size:28px;margin-bottom:10px;opacity:.5}
+.empty-state-title{font-size:13px;font-weight:600;color:var(--g500);margin-bottom:4px}
+.empty-state-sub{font-size:12px;color:var(--g400)}
+
+/* ── Responsive ──────────────────────────────────── */
+@media(max-width:900px){.stat-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){
+  .sidebar{display:none}
+  .content{padding:16px 14px 80px}
+  .queue-grid{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .bottom-nav{display:flex}
+  .topbar{padding:0 14px}
+}
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:white;
+  border-top:1px solid var(--g200);z-index:40;padding-bottom:env(safe-area-inset-bottom,0)}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 0 7px;
+  background:none;border:none;cursor:pointer;color:var(--g400);font-size:10px;font-weight:500;gap:3px;transition:color .13s}
+.bn-item.active{color:var(--a)}
+.bn-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <div>
+      <div class="logo-name">RoyaltyOS</div>
+      <div class="logo-sub">Validator Portal</div>
+    </div>
+  </div>
+
+  <span class="nav-label">Workspace</span>
+  <button class="nav-item active" onclick="navigate('overview',this)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Overview
+  </button>
+  <button class="nav-item" onclick="navigate('queue',this)">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Validation Queue
+    <span class="nav-badge amber">5</span>
+  </button>
+  <button class="nav-item" onclick="navigate('history',this)">
+    <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109 9"/><path d="M3 3v6h6"/><path d="M12 7v5l3 3"/></svg>
+    History
+  </button>
+  <button class="nav-item" onclick="navigate('proof',this)">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Proof Records
+  </button>
+
+  <span class="nav-label">Insights</span>
+  <button class="nav-item" onclick="navigate('activity',this)">
+    <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    Activity Log
+  </button>
+
+  <div class="sidebar-footer">
+    <div class="avatar-row">
+      <div class="avatar">RV</div>
+      <div>
+        <div class="avatar-name">Rizal Valentino</div>
+        <div class="avatar-role">Senior Validator</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <!-- Topbar -->
+  <header class="topbar">
+    <div>
+      <div class="topbar-title" id="tb-title">Overview</div>
+      <div class="topbar-sub" id="tb-sub">Validation status and pending work</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn notif-dot" title="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <button class="icon-btn" title="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ═══ PAGE: OVERVIEW ═══════════════════════════════════════════════ -->
+    <div class="page active" id="page-overview">
+
+      <!-- Hero -->
+      <div class="hero-banner">
+        <div class="hero-greeting">Good morning ✦</div>
+        <div class="hero-name">Rizal Valentino</div>
+        <div class="hero-meta">
+          Senior Validator · <strong>5 items</strong> awaiting validation ·
+          <strong>3</strong> requiring urgent review today
+        </div>
+        <div class="hero-actions">
+          <button class="hero-btn primary" onclick="navigate('queue',document.querySelector('[onclick*=queue]'))">
+            Review Queue
+          </button>
+          <button class="hero-btn secondary" onclick="navigate('history',document.querySelector('[onclick*=history]'))">
+            View History
+          </button>
+        </div>
+        <div class="hero-orb"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Validation Overview</div>
+          <div class="section-sub">Your active workload and performance this month.</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#f5f0ff;color:#7c3aed">
+              <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            </div>
+            <div>
+              <div class="stat-value">5</div>
+              <div class="stat-label">Pending Validations</div>
+              <div class="stat-sub">3 urgent, 2 standard</div>
+            </div>
+            <div class="stat-trend warn">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              +2 since yesterday
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#dcfce7;color:#166534">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div>
+              <div class="stat-value">48</div>
+              <div class="stat-label">Approved This Month</div>
+              <div class="stat-sub">Avg. 2.3 per day</div>
+            </div>
+            <div class="stat-trend up">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              +12% vs last month
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fef2f2;color:#991b1b">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <div>
+              <div class="stat-value">4</div>
+              <div class="stat-label">Rejected This Month</div>
+              <div class="stat-sub">7.7% rejection rate</div>
+            </div>
+            <div class="stat-trend warn">
+              <svg viewBox="0 0 24 24"><polyline points="18 9 12 15 6 9"/></svg>
+              -2 vs last month
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#eff6ff;color:#1e40af">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="stat-value">52</div>
+              <div class="stat-label">Proofs Generated</div>
+              <div class="stat-sub">All immutably stored</div>
+            </div>
+            <div class="stat-trend up">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              100% coverage
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two column: Queue preview + Activity -->
+      <div class="two-col">
+
+        <!-- Queue preview -->
+        <div class="section">
+          <div class="section-head" style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div class="section-title">Next to Validate</div>
+              <div class="section-sub">Highest priority items in your queue.</div>
+            </div>
+            <button class="btn sm secondary" onclick="navigate('queue',document.querySelector('[onclick*=queue]'))">See all →</button>
+          </div>
+          <div class="card">
+            <!-- Item 1 -->
+            <div style="padding:14px 18px;border-bottom:1px solid var(--g100)">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--g900)">Resonance Vol. 1</div>
+                  <div style="font-size:11px;color:var(--g400);margin-top:2px">Amara Wijaya · Royalty Rule Submission</div>
+                </div>
+                <span class="chip amber">Urgent</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:11px;color:var(--g400)">Rate: 12% of net revenue · Submitted Apr 9</span>
+                <button class="btn sm primary" onclick="openModal('modal-validate','Resonance Vol. 1')">Review</button>
+              </div>
+            </div>
+            <!-- Item 2 -->
+            <div style="padding:14px 18px;border-bottom:1px solid var(--g100)">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--g900)">The Quiet Hours EP</div>
+                  <div style="font-size:11px;color:var(--g400);margin-top:2px">Amara Wijaya · Payment Verification</div>
+                </div>
+                <span class="chip amber">Urgent</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:11px;color:var(--g400)">$214.50 claimed · Submitted Apr 10</span>
+                <button class="btn sm primary" onclick="openModal('modal-validate','The Quiet Hours EP')">Review</button>
+              </div>
+            </div>
+            <!-- Item 3 -->
+            <div style="padding:14px 18px">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:var(--g900)">Urban Drift Photography</div>
+                  <div style="font-size:11px;color:var(--g400);margin-top:2px">Sari Nuraini · Work Registration</div>
+                </div>
+                <span class="chip blue">Standard</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:11px;color:var(--g400)">New work registration · Submitted Apr 11</span>
+                <button class="btn sm secondary" onclick="openModal('modal-validate','Urban Drift Photography')">Review</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">Recent Activity</div>
+            <div class="section-sub">Your latest validation actions.</div>
+          </div>
+          <div class="card">
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#dcfce7;color:#166534">
+                <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+              </div>
+              <div class="feed-text"><strong>Approved</strong> royalty rule for Echoes of Spring</div>
+              <div class="feed-time">Apr 11</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#fef2f2;color:#991b1b">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </div>
+              <div class="feed-text"><strong>Rejected</strong> payment claim — missing usage data</div>
+              <div class="feed-time">Apr 10</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#eff6ff;color:#1e40af">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </div>
+              <div class="feed-text"><strong>Proof recorded</strong> for Resonance Vol. 1 payment</div>
+              <div class="feed-time">Apr 10</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#dcfce7;color:#166534">
+                <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+              </div>
+              <div class="feed-text"><strong>Approved</strong> work registration for Night Market Series</div>
+              <div class="feed-time">Apr 9</div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-dot" style="background:#f5f0ff;color:#7c3aed">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="feed-text"><strong>Flagged</strong> rule for secondary review — rate anomaly</div>
+              <div class="feed-time">Apr 8</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Validation performance -->
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Monthly Performance</div>
+          <div class="section-sub">Approval accuracy and throughput for April 2025.</div>
+        </div>
+        <div class="card card-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+            <div>
+              <div style="font-size:11px;color:var(--g400);font-weight:500;margin-bottom:6px">Approval Rate</div>
+              <div style="font-size:20px;font-weight:700;color:var(--g900)">92.3%</div>
+              <div class="prog-bar"><div class="prog-fill" style="width:92%"></div></div>
+              <div style="font-size:10.5px;color:var(--g400);margin-top:5px">48 of 52 reviewed</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--g400);font-weight:500;margin-bottom:6px">Avg. Review Time</div>
+              <div style="font-size:20px;font-weight:700;color:var(--g900)">4.2 h</div>
+              <div class="prog-bar"><div class="prog-fill" style="width:58%;background:#16a34a"></div></div>
+              <div style="font-size:10.5px;color:var(--g400);margin-top:5px">Target: 8 h per item</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--g400);font-weight:500;margin-bottom:6px">Proof Coverage</div>
+              <div style="font-size:20px;font-weight:700;color:var(--g900)">100%</div>
+              <div class="prog-bar"><div class="prog-fill" style="width:100%;background:#1d4ed8"></div></div>
+              <div style="font-size:10.5px;color:var(--g400);margin-top:5px">52 proofs generated</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /overview -->
+
+
+    <!-- ═══ PAGE: QUEUE ═══════════════════════════════════════════════════ -->
+    <div class="page" id="page-queue">
+      <div class="section">
+        <div class="section-head" style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div>
+            <div class="section-title">Validation Queue</div>
+            <div class="section-sub">Items submitted for your review. Urgent items are highlighted.</div>
+          </div>
+          <div class="tab-strip">
+            <button class="tab active" onclick="filterQueue('all',this)">All (5)</button>
+            <button class="tab" onclick="filterQueue('urgent',this)">Urgent (3)</button>
+            <button class="tab" onclick="filterQueue('standard',this)">Standard (2)</button>
+          </div>
+        </div>
+
+        <div class="queue-grid" id="queue-grid">
+
+          <div class="queue-card urgent" data-type="urgent">
+            <div class="qc-header">
+              <div>
+                <div class="qc-title">Resonance Vol. 1</div>
+                <div class="qc-meta">Royalty Rule · Amara Wijaya</div>
+              </div>
+              <span class="chip amber">Urgent</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qc-field-label">Payment Rate</div><div class="qc-field-value">12% net revenue</div></div>
+              <div><div class="qc-field-label">Submitted</div><div class="qc-field-value">Apr 9, 2025</div></div>
+              <div><div class="qc-field-label">Work Type</div><div class="qc-field-value">Music Album</div></div>
+              <div><div class="qc-field-label">Funds Held</div><div class="qc-field-value">$842.00</div></div>
+            </div>
+            <div class="qc-actions">
+              <button class="btn approve sm" onclick="openModal('modal-validate','Resonance Vol. 1')">
+                <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Approve
+              </button>
+              <button class="btn reject sm" onclick="alert('Rejection flow opened.')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reject
+              </button>
+              <button class="btn secondary sm" onclick="openModal('modal-validate','Resonance Vol. 1')">Details</button>
+            </div>
+          </div>
+
+          <div class="queue-card urgent" data-type="urgent">
+            <div class="qc-header">
+              <div>
+                <div class="qc-title">The Quiet Hours EP</div>
+                <div class="qc-meta">Payment Verification · Amara Wijaya</div>
+              </div>
+              <span class="chip amber">Urgent</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qc-field-label">Claimed Amount</div><div class="qc-field-value">$214.50</div></div>
+              <div><div class="qc-field-label">Submitted</div><div class="qc-field-value">Apr 10, 2025</div></div>
+              <div><div class="qc-field-label">Usage Period</div><div class="qc-field-value">Mar 2025</div></div>
+              <div><div class="qc-field-label">Streams Logged</div><div class="qc-field-value">1,830</div></div>
+            </div>
+            <div class="qc-actions">
+              <button class="btn approve sm" onclick="alert('Approved!')">
+                <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Approve
+              </button>
+              <button class="btn reject sm" onclick="alert('Rejection flow opened.')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reject
+              </button>
+              <button class="btn secondary sm" onclick="openModal('modal-validate','The Quiet Hours EP')">Details</button>
+            </div>
+          </div>
+
+          <div class="queue-card urgent" data-type="urgent">
+            <div class="qc-header">
+              <div>
+                <div class="qc-title">Night Market Series</div>
+                <div class="qc-meta">Rule Amendment · Budi Santoso</div>
+              </div>
+              <span class="chip amber">Urgent</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qc-field-label">Change</div><div class="qc-field-value">Rate 8% → 11%</div></div>
+              <div><div class="qc-field-label">Submitted</div><div class="qc-field-value">Apr 10, 2025</div></div>
+              <div><div class="qc-field-label">Work Type</div><div class="qc-field-value">Photography</div></div>
+              <div><div class="qc-field-label">Reason</div><div class="qc-field-value">Market rate update</div></div>
+            </div>
+            <div class="qc-actions">
+              <button class="btn approve sm" onclick="alert('Approved!')">
+                <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Approve
+              </button>
+              <button class="btn reject sm" onclick="alert('Rejection flow opened.')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reject
+              </button>
+              <button class="btn secondary sm" onclick="openModal('modal-validate','Night Market Series')">Details</button>
+            </div>
+          </div>
+
+          <div class="queue-card normal" data-type="standard">
+            <div class="qc-header">
+              <div>
+                <div class="qc-title">Urban Drift Photography</div>
+                <div class="qc-meta">Work Registration · Sari Nuraini</div>
+              </div>
+              <span class="chip blue">Standard</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qc-field-label">Work Type</div><div class="qc-field-value">Photography Set</div></div>
+              <div><div class="qc-field-label">Submitted</div><div class="qc-field-value">Apr 11, 2025</div></div>
+              <div><div class="qc-field-label">Proposed Rate</div><div class="qc-field-value">15% net revenue</div></div>
+              <div><div class="qc-field-label">Works Count</div><div class="qc-field-value">34 images</div></div>
+            </div>
+            <div class="qc-actions">
+              <button class="btn approve sm" onclick="alert('Approved!')">
+                <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Approve
+              </button>
+              <button class="btn reject sm" onclick="alert('Rejection flow opened.')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reject
+              </button>
+              <button class="btn secondary sm" onclick="openModal('modal-validate','Urban Drift Photography')">Details</button>
+            </div>
+          </div>
+
+          <div class="queue-card normal" data-type="standard">
+            <div class="qc-header">
+              <div>
+                <div class="qc-title">Echoes of Spring</div>
+                <div class="qc-meta">Payment Verification · Citra Dewi</div>
+              </div>
+              <span class="chip blue">Standard</span>
+            </div>
+            <div class="qc-fields">
+              <div><div class="qc-field-label">Claimed Amount</div><div class="qc-field-value">$510.00</div></div>
+              <div><div class="qc-field-label">Submitted</div><div class="qc-field-value">Apr 12, 2025</div></div>
+              <div><div class="qc-field-label">Usage Period</div><div class="qc-field-value">Mar 2025</div></div>
+              <div><div class="qc-field-label">Streams Logged</div><div class="qc-field-value">4,250</div></div>
+            </div>
+            <div class="qc-actions">
+              <button class="btn approve sm" onclick="alert('Approved!')">
+                <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Approve
+              </button>
+              <button class="btn reject sm" onclick="alert('Rejection flow opened.')">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reject
+              </button>
+              <button class="btn secondary sm" onclick="openModal('modal-validate','Echoes of Spring')">Details</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /queue -->
+
+
+    <!-- ═══ PAGE: HISTORY ═════════════════════════════════════════════════ -->
+    <div class="page" id="page-history">
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Validation History</div>
+          <div class="section-sub">A complete record of your review decisions.</div>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Work</th>
+                  <th>Creator</th>
+                  <th>Type</th>
+                  <th>Decision</th>
+                  <th>Note</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="muted">Apr 11</td>
+                  <td class="bold">Echoes of Spring</td>
+                  <td>Citra Dewi</td>
+                  <td><span class="chip purple">Rule</span></td>
+                  <td><span class="chip green">Approved</span></td>
+                  <td class="muted">Rate within threshold</td>
+                  <td><button class="tbl-action" onclick="openModal('modal-history','Echoes of Spring')">Details</button></td>
+                </tr>
+                <tr>
+                  <td class="muted">Apr 10</td>
+                  <td class="bold">Midnight Canopy</td>
+                  <td>Fajar Kurniawan</td>
+                  <td><span class="chip blue">Payment</span></td>
+                  <td><span class="chip red">Rejected</span></td>
+                  <td class="muted">Usage data missing</td>
+                  <td><button class="tbl-action" onclick="openModal('modal-history','Midnight Canopy')">Details</button></td>
+                </tr>
+                <tr>
+                  <td class="muted">Apr 10</td>
+                  <td class="bold">Resonance Vol. 1</td>
+                  <td>Amara Wijaya</td>
+                  <td><span class="chip blue">Payment</span></td>
+                  <td><span class="chip green">Approved</span></td>
+                  <td class="muted">All usage records verified</td>
+                  <td><button class="tbl-action" onclick="openModal('modal-history','Resonance Vol. 1')">Details</button></td>
+                </tr>
+                <tr>
+                  <td class="muted">Apr 9</td>
+                  <td class="bold">Night Market Series</td>
+                  <td>Budi Santoso</td>
+                  <td><span class="chip purple">Rule</span></td>
+                  <td><span class="chip green">Approved</span></td>
+                  <td class="muted">New registration</td>
+                  <td><button class="tbl-action" onclick="openModal('modal-history','Night Market Series')">Details</button></td>
+                </tr>
+                <tr>
+                  <td class="muted">Apr 8</td>
+                  <td class="bold">Solar Frequencies</td>
+                  <td>Dewi Rahayu</td>
+                  <td><span class="chip purple">Rule</span></td>
+                  <td><span class="chip amber">Flagged</span></td>
+                  <td class="muted">Rate anomaly — in review</td>
+                  <td><button class="tbl-action" onclick="openModal('modal-history','Solar Frequencies')">Details</button></td>
+                </tr>
+                <tr>
+                  <td class="muted">Apr 7</td>
+                  <td class="bold">The Quiet Hours EP</td>
+                  <td>Amara Wijaya</td>
+                  <td><span class="chip gray">Registration</span></td>
+                  <td><span class="chip green">Approved</span></td>
+                  <td class="muted">Documentation complete</td>
+                  <td><button class="tbl-action" onclick="openModal('modal-history','The Quiet Hours EP')">Details</button></td>
+                </tr>
+                <tr>
+                  <td class="muted">Apr 5</td>
+                  <td class="bold">Coastal Frames</td>
+                  <td>Sari Nuraini</td>
+                  <td><span class="chip blue">Payment</span></td>
+                  <td><span class="chip green">Approved</span></td>
+                  <td class="muted">$336.80 verified</td>
+                  <td><button class="tbl-action" onclick="openModal('modal-history','Coastal Frames')">Details</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div><!-- /history -->
+
+
+    <!-- ═══ PAGE: PROOF ═══════════════════════════════════════════════════ -->
+    <div class="page" id="page-proof">
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Proof Records</div>
+          <div class="section-sub">Immutable validation evidence for each settlement event.</div>
+        </div>
+        <div class="proof-chain">
+          <div class="proof-item">
+            <div class="proof-icon" style="background:#dcfce7;color:#166534">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Rule Approved — Resonance Vol. 1</div>
+              <div class="proof-desc">12% net revenue royalty rule validated and confirmed</div>
+              <div class="proof-tx">Ref: 0x3a9f4d2e…c12b · Jan 15, 2025</div>
+            </div>
+            <span class="chip green">Verified</span>
+            <button class="proof-btn" onclick="openModal('modal-proof','Resonance Vol. 1 — Rule')">View</button>
+          </div>
+          <div class="proof-item">
+            <div class="proof-icon" style="background:#eff6ff;color:#1e40af">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Usage Recorded — Resonance Vol. 1</div>
+              <div class="proof-desc">7,200 streams verified against platform data for April cycle</div>
+              <div class="proof-tx">Ref: 0x7d2e9f1a…f89a · Apr 1, 2025</div>
+            </div>
+            <span class="chip green">Verified</span>
+            <button class="proof-btn" onclick="openModal('modal-proof','Resonance Vol. 1 — Usage')">View</button>
+          </div>
+          <div class="proof-item">
+            <div class="proof-icon" style="background:#dcfce7;color:#166534">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Payment Completed — Resonance Vol. 1</div>
+              <div class="proof-desc">$842.00 royalty payment validated and disbursed to creator</div>
+              <div class="proof-tx">Ref: 0x1bc4e2d9…290c · Apr 10, 2025</div>
+            </div>
+            <span class="chip green">Verified</span>
+            <button class="proof-btn" onclick="openModal('modal-proof','Resonance Vol. 1 — Payment')">View</button>
+          </div>
+          <div class="proof-item">
+            <div class="proof-icon" style="background:#dcfce7;color:#166534">
+              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Rule Approved — The Quiet Hours EP</div>
+              <div class="proof-desc">10% net revenue royalty rule validated and confirmed</div>
+              <div class="proof-tx">Ref: 0x8f3b1c7d…a45e · Mar 5, 2025</div>
+            </div>
+            <span class="chip green">Verified</span>
+            <button class="proof-btn" onclick="openModal('modal-proof','Quiet Hours EP — Rule')">View</button>
+          </div>
+          <div class="proof-item">
+            <div class="proof-icon" style="background:var(--amber-bg);color:#d97706">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="proof-label">Proof Pending — Urban Drift Photography</div>
+              <div class="proof-desc">Awaiting final validation before proof is generated</div>
+              <div class="proof-tx">Submitted Apr 11, 2025 · Under review</div>
+            </div>
+            <span class="chip amber">Pending</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- /proof -->
+
+
+    <!-- ═══ PAGE: ACTIVITY ════════════════════════════════════════════════ -->
+    <div class="page" id="page-activity">
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Activity Log</div>
+          <div class="section-sub">Full history of validation events and system actions.</div>
+        </div>
+        <div class="two-col">
+          <div class="card" style="padding:20px">
+            <div class="section-title" style="margin-bottom:14px">Your Actions</div>
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Approved — Echoes of Spring rule</div>
+                  <div class="tl-desc">Rate of 9% confirmed. Proof generated.</div>
+                  <div class="tl-time">Apr 11, 2025 · 14:32</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot pending"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Rejected — Midnight Canopy payment</div>
+                  <div class="tl-desc">Insufficient usage documentation provided.</div>
+                  <div class="tl-time">Apr 10, 2025 · 10:17</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Approved — Resonance Vol. 1 payment</div>
+                  <div class="tl-desc">$842.00 validated. Settlement triggered.</div>
+                  <div class="tl-time">Apr 10, 2025 · 09:04</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Approved — Night Market Series registration</div>
+                  <div class="tl-desc">New work registration accepted.</div>
+                  <div class="tl-time">Apr 9, 2025 · 16:45</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot purple"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Flagged — Solar Frequencies rule</div>
+                  <div class="tl-desc">Rate anomaly detected. Sent to secondary review.</div>
+                  <div class="tl-time">Apr 8, 2025 · 11:21</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="padding:20px">
+            <div class="section-title" style="margin-bottom:14px">System Events</div>
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot info"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Proof stored — Resonance Vol. 1</div>
+                  <div class="tl-desc">Immutable record created. Ref: 0x1bc4…290c</div>
+                  <div class="tl-time">Apr 10, 2025 · 09:06</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot done"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Payment disbursed — Resonance Vol. 1</div>
+                  <div class="tl-desc">$842.00 transferred to creator account.</div>
+                  <div class="tl-time">Apr 10, 2025 · 09:05</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot info"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Proof stored — The Quiet Hours EP</div>
+                  <div class="tl-desc">Immutable record created. Ref: 0x8f3b…a45e</div>
+                  <div class="tl-time">Apr 7, 2025 · 13:40</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Queue updated — 3 new items</div>
+                  <div class="tl-desc">New submissions assigned to your queue.</div>
+                  <div class="tl-time">Apr 9, 2025 · 08:00</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot-col"><div class="tl-dot done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+                <div class="tl-body">
+                  <div class="tl-title">Proof stored — Night Market Series</div>
+                  <div class="tl-desc">Registration proof saved. Ref: 0x9c2a…11fd</div>
+                  <div class="tl-time">Apr 9, 2025 · 17:01</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /activity -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Bottom Nav (mobile) -->
+<nav class="bottom-nav">
+  <button class="bn-item active" onclick="navigate('overview',this,true)">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Overview
+  </button>
+  <button class="bn-item" onclick="navigate('queue',this,true)">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Queue
+  </button>
+  <button class="bn-item" onclick="navigate('history',this,true)">
+    <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109 9"/><path d="M3 3v6h6"/></svg>
+    History
+  </button>
+  <button class="bn-item" onclick="navigate('proof',this,true)">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Proof
+  </button>
+</nav>
+
+<!-- ═══ MODALS ════════════════════════════════════════════════════════════ -->
+
+<!-- Validate modal -->
+<div class="modal-overlay" id="modal-validate">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-validate-title">Review Submission</div>
+      <button class="modal-close" onclick="closeModal('modal-validate')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="kv-grid">
+        <div class="kv-item"><div class="kv-key">Creator</div><div class="kv-val">Amara Wijaya</div></div>
+        <div class="kv-item"><div class="kv-key">Submitted</div><div class="kv-val">Apr 9, 2025</div></div>
+        <div class="kv-item"><div class="kv-key">Work Type</div><div class="kv-val">Music Album</div></div>
+        <div class="kv-item"><div class="kv-key">Payment Rate</div><div class="kv-val">12% net revenue</div></div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Rule Summary</div>
+        <div class="modal-field-value">Royalty is calculated as 12% of net streaming revenue after platform fees, applied per billing cycle. Payment trigger: monthly.</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Compliance Check</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g700)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            Rate within approved threshold (8–18%)
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g700)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            Creator identity verified
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g700)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            Work registration confirmed
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--g700)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            No conflicting rules found
+          </div>
+        </div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Technical Reference</div>
+        <div class="modal-field-value mono">rule_id: RL-2025-001-AW · hash: 0x3a9f4d2e…c12b</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn approve" onclick="alert('Submission approved! Proof will be generated.');closeModal('modal-validate')">
+          <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Approve Submission
+        </button>
+        <button class="btn reject" onclick="alert('Submission rejected.');closeModal('modal-validate')">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- History detail modal -->
+<div class="modal-overlay" id="modal-history">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-history-title">Validation Record</div>
+      <button class="modal-close" onclick="closeModal('modal-history')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="kv-grid">
+        <div class="kv-item"><div class="kv-key">Decision</div><div class="kv-val" style="color:#166534">Approved</div></div>
+        <div class="kv-item"><div class="kv-key">Date</div><div class="kv-val">Apr 11, 2025</div></div>
+        <div class="kv-item"><div class="kv-key">Validated by</div><div class="kv-val">Rizal Valentino</div></div>
+        <div class="kv-item"><div class="kv-key">Review Time</div><div class="kv-val">3.8 hours</div></div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Validator Notes</div>
+        <div class="modal-field-value">Rate of 9% confirmed as within approved threshold. Creator documentation complete and verified. No conflicts found.</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Proof Reference</div>
+        <div class="modal-field-value mono">proof_id: PF-2025-0411-ES · ref: 0xab12…77de · Stored immutably</div>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn primary" style="width:100%;justify-content:center" onclick="closeModal('modal-history')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Proof detail modal -->
+<div class="modal-overlay" id="modal-proof">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-proof-title">Proof Details</div>
+      <button class="modal-close" onclick="closeModal('modal-proof')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="kv-grid">
+        <div class="kv-item"><div class="kv-key">Status</div><div class="kv-val" style="color:#166534">Verified</div></div>
+        <div class="kv-item"><div class="kv-key">Stored</div><div class="kv-val">Jan 15, 2025</div></div>
+        <div class="kv-item"><div class="kv-key">Storage Type</div><div class="kv-val">Distributed ledger</div></div>
+        <div class="kv-item"><div class="kv-key">Immutable</div><div class="kv-val">Yes</div></div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Transaction Reference</div>
+        <div class="modal-field-value mono">0x3a9f4d2ec8b1f7e6d3a92c4b5f8e1d2a7c9b0e3f4d6a8c1b2e5f7a9c3d4e6b8</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Event Type</div>
+        <div class="modal-field-value">Royalty Rule Approval — Resonance Vol. 1</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-field-label">Validated By</div>
+        <div class="modal-field-value">Rizal Valentino · Senior Validator · RoyaltyOS</div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <button class="btn primary" style="flex:1;justify-content:center" onclick="alert('Opening explorer...');closeModal('modal-proof')">
+          View on Explorer
+        </button>
+        <button class="btn secondary" style="flex:1;justify-content:center" onclick="closeModal('modal-proof')">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const pages = {
+  overview: { title:'Overview', sub:'Validation status and pending work' },
+  queue:    { title:'Validation Queue', sub:'Items awaiting your review' },
+  history:  { title:'History', sub:'Your past validation decisions' },
+  proof:    { title:'Proof Records', sub:'Immutable settlement evidence' },
+  activity: { title:'Activity Log', sub:'Full event history' },
+};
+
+function navigate(id, el, mobile) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('tb-title').textContent = pages[id].title;
+  document.getElementById('tb-sub').textContent = pages[id].sub;
+  if (!mobile) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  } else {
+    document.querySelectorAll('.bn-item').forEach(n => n.classList.remove('active'));
+  }
+  el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openModal(id, title) {
+  const el = document.getElementById(id);
+  const t  = document.getElementById(id + '-title');
+  if (t && title) t.textContent = title;
+  el.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function filterQueue(type, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('.queue-card');
+  cards.forEach(c => {
+    if (type === 'all') { c.style.display = ''; return; }
+    c.style.display = c.dataset.type === type ? '' : 'none';
+  });
+}
+
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+});
+</script>
+</body>
+</html>
