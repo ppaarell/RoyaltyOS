@@ -1,5 +1,11 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/creator", "destination": "/creator/index.html" },
+    { "source": "/validator", "destination": "/validator/index.html" },
+    { "source": "/dsp", "destination": "/dsp/index.html" },
+    { "source": "/auditor", "destination": "/auditor/index.html" }
   ]
 }
