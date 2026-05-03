@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> <link rel="icon" type="image/png" href="./favicon.png">
+<head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RoyaltyOS · Creator Dashboard</title>
@@ -16,7 +16,35 @@
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState } = React;
+const { useState, useContext, createContext } = React;
+
+/* ── Plain English Context ──────────────────────────────────────────────── */
+const PlainCtx = createContext(false);
+const usePlain = () => useContext(PlainCtx);
+
+/* ── Jargon Tooltip ─────────────────────────────────────────────────────── */
+function JTip({ term, plain, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <span style={{position:"relative",display:"inline"}}>
+      <span
+        onClick={() => setOpen(v=>!v)}
+        style={{borderBottom:"1px dashed #a038b2",cursor:"pointer",color:"#7420a0",fontWeight:600,fontSize:"inherit"}}>
+        {children || term}
+      </span>
+      {open && (
+        <>
+          <span onClick={() => setOpen(false)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:80}}/>
+          <span style={{position:"absolute",bottom:"calc(100% + 6px)",left:"50%",transform:"translateX(-50%)",zIndex:90,backgroundColor:"#1f1135",color:"white",borderRadius:10,padding:"8px 12px",fontSize:11,lineHeight:1.5,whiteSpace:"normal",minWidth:200,maxWidth:260,display:"block",boxShadow:"0 8px 24px rgba(0,0,0,0.2)"}}>
+            <span style={{fontWeight:700,fontSize:11,color:"#d4a8e0",display:"block",marginBottom:3}}>{term}</span>
+            {plain}
+            <span style={{position:"absolute",bottom:-5,left:"50%",transform:"translateX(-50%)",width:10,height:10,backgroundColor:"#1f1135",clipPath:"polygon(0 0,100% 0,50% 100%)"}}/>
+          </span>
+        </>
+      )}
+    </span>
+  );
+}
 
 /* ── Theme ─────────────────────────────────────────────────────────────── */
 const A  = "#a038b2";
@@ -42,15 +70,18 @@ const XIco         = ({size=16}) => <SI size={size}><path d="M18 6 6 18"/><path 
 const ExternalLink = ({size=16}) => <SI size={size}><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></SI>;
 const DollarSign   = ({size=16}) => <SI size={size}><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></SI>;
 const Zap          = ({size=16}) => <SI size={size}><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></SI>;
-const ArrowUpRight = ({size=16}) => <SI size={size}><path d="M7 7h10v10"/><path d="M7 17 17 7"/></SI>;
+const TrendUp     = ({size=16}) => <SI size={size}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></SI>;
+const Star        = ({size=16}) => <SI size={size}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></SI>;
+const AlertTriangle=({size=16})=> <SI size={size}><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></SI>;
+const Eye         = ({size=16}) => <SI size={size}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></SI>;
 const BookOpen     = ({size=16}) => <SI size={size}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></SI>;
+const MessageSquare= ({size=16}) => <SI size={size}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></SI>;
+const ArrowUpRight = ({size=16}) => <SI size={size}><path d="M7 7h10v10"/><path d="M7 17 17 7"/></SI>;
 
 /* ── Mock Data ──────────────────────────────────────────────────────────── */
 const STATS = [
-  { label:"Your Works",           value:"3",          sub:"2 active · 1 pending",  icon:Music,       ic:A,         ib:AL        },
-  { label:"Active Royalty Rules", value:"2",          sub:"1 pending approval",     icon:Shield,      ic:"#1a7a50", ib:"#edf7f3" },
-  { label:"Latest Payment",       value:"$842",       sub:"Apr 10, 2025",           icon:DollarSign,  ic:"#b06010", ib:"#fef9ed" },
-  { label:"Proof Status",         value:"3 Verified", sub:"1 in progress",          icon:CheckCircle, ic:"#1a7a50", ib:"#edf7f3" },
+  { label:"Latest Payment",  value:"$842",       sub:"Apr 10, 2025",  icon:DollarSign,  ic:"#b06010", ib:"#fef9ed", growth:null },
+  { label:"Proof Status",    value:"3 Verified", sub:"1 in progress", icon:CheckCircle, ic:"#1a7a50", ib:"#edf7f3", growth:null },
 ];
 const WORKS = [
   { id:1, title:"Resonance Vol. 1",          type:"Music Album", registered:"Jan 12, 2025", regStatus:"Registered", ruleStatus:"Active"  },
@@ -158,17 +189,43 @@ function RegisterWorkModal({ onClose }) {
 function HeroBanner({ setTab }) {
   const [showRegister, setShowRegister] = useState(false);
   return (
-    <div className="mb-6 rounded-2xl relative overflow-hidden"
+    <div className="mb-5 rounded-2xl relative overflow-hidden"
       style={{background:"linear-gradient(135deg,#a038b2 0%,#7420a0 55%,#561680 100%)"}}>
       <div className="relative p-5 sm:p-6" style={{zIndex:10}}>
-        <div className="text-xs font-medium mb-1" style={{color:"rgba(255,255,255,0.6)"}}>Good morning 👋</div>
-        <div className="text-xl font-bold text-white mb-1.5">Farel Ramadhana</div>
-        <div className="text-sm" style={{color:"rgba(255,255,255,0.72)"}}>
-          3 registered works · 2 active royalty rules · <span className="font-semibold text-white">$1,056.50</span> earned this month
+        {/* Top row: greeting + growth badge */}
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div>
+            <div className="text-xs font-medium mb-1" style={{color:"rgba(255,255,255,0.6)"}}>Good morning 👋</div>
+            <div className="text-xl font-bold text-white">Farel Ramadhana</div>
+          </div>
+          {/* Monthly growth badge */}
+          <div style={{display:"flex",alignItems:"center",gap:5,backgroundColor:"rgba(34,197,94,0.22)",border:"1px solid rgba(34,197,94,0.4)",borderRadius:12,padding:"6px 10px",flexShrink:0}}>
+            <TrendUp size={13} style={{color:"#4ade80"}}/>
+            <span style={{color:"#4ade80",fontSize:12,fontWeight:700}}>+12%</span>
+            <span style={{color:"rgba(255,255,255,0.55)",fontSize:11}}>this month</span>
+          </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
+
+        {/* Royalty highlight row */}
+        <div style={{backgroundColor:"rgba(255,255,255,0.1)",borderRadius:14,padding:"12px 14px",marginBottom:14,display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
+          <div style={{flex:1,minWidth:120}}>
+            <div style={{color:"rgba(255,255,255,0.55)",fontSize:10,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:2}}>Total Royalty This Month</div>
+            <div style={{color:"white",fontSize:26,fontWeight:800,lineHeight:1.1,letterSpacing:"-0.02em"}}>$1,056.50</div>
+          </div>
+          <div style={{width:1,height:36,backgroundColor:"rgba(255,255,255,0.15)",flexShrink:0}}/>
+          {/* Top earner */}
+          <div style={{flex:1,minWidth:120}}>
+            <div style={{color:"rgba(255,255,255,0.55)",fontSize:10,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:2,display:"flex",alignItems:"center",gap:4}}>
+              <Star size={10} style={{color:"#fbbf24"}}/> Top Earner
+            </div>
+            <div style={{color:"white",fontSize:13,fontWeight:700,lineHeight:1.2}}>Resonance Vol. 1</div>
+            <div style={{color:"rgba(255,255,255,0.5)",fontSize:11,marginTop:2}}>$842 · 7,200 streams</div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
           <button onClick={() => setShowRegister(true)} style={{backgroundColor:"rgba(255,255,255,0.18)",color:"white",padding:"6px 14px",borderRadius:12,fontSize:12,fontWeight:600,border:"none",cursor:"pointer"}}>
-            Register a Work
+            + Register a Work
           </button>
           <button onClick={() => setTab("payments")} style={{backgroundColor:"white",color:"#7420a0",padding:"6px 14px",borderRadius:12,fontSize:12,fontWeight:600,border:"none",cursor:"pointer"}}>
             View Payments →
@@ -184,11 +241,63 @@ function HeroBanner({ setTab }) {
 }
 
 /* ── Account Overview ───────────────────────────────────────────────────── */
+function WorksRoyaltyCard() {
+  const works = [
+    { title:"Resonance Vol. 1",          type:"Music Album",  royalty:"Active",  rate:"12%", earned:"$1,440" },
+    { title:"The Quiet Hours EP",        type:"Music EP",     royalty:"Active",  rate:"10%", earned:"$214"   },
+    { title:"Visual Essay: Urban Drift", type:"Photography",  royalty:"Pending", rate:"15%", earned:"—"      },
+  ];
+  return (
+    <Card className="p-4" style={{gridColumn:"1 / -1"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <div style={{width:30,height:30,borderRadius:10,backgroundColor:AL,display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <Music size={14} style={{color:A}}/>
+          </div>
+          <div>
+            <div style={{fontSize:13,fontWeight:700,color:"#111827"}}>My Works</div>
+            <div style={{fontSize:11,color:"#9ca3af"}}>3 works · <span style={{color:"#1a7a50",fontWeight:600}}>2 active with royalty</span> · <span style={{color:"#a06010"}}>1 pending</span></div>
+          </div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:5,backgroundColor:"rgba(160,56,178,0.08)",borderRadius:9,padding:"4px 9px"}}>
+          <TrendUp size={11} style={{color:"#1a7a50"}}/>
+          <span style={{color:"#1a7a50",fontSize:11,fontWeight:700}}>+12% this month</span>
+        </div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {works.map((w,i) => {
+          const active = w.royalty === "Active";
+          return (
+            <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 10px",borderRadius:10,backgroundColor:active?"#faf8fc":"#f9fafb",border:`1px solid ${active?"#e8d8f0":"#f3f4f6"}`}}>
+              <div style={{width:7,height:7,borderRadius:"50%",backgroundColor:active?"#22c55e":"#f59e0b",flexShrink:0}}/>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:12,fontWeight:600,color:"#111827",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{w.title}</div>
+                <div style={{fontSize:10,color:"#9ca3af"}}>{w.type}</div>
+              </div>
+              {active
+                ? <>
+                    <div style={{display:"flex",alignItems:"center",gap:4,backgroundColor:"#edf7f3",borderRadius:7,padding:"3px 8px"}}>
+                      <Shield size={10} style={{color:"#1a7a50"}}/>
+                      <span style={{fontSize:10,fontWeight:600,color:"#1a7a50"}}>{w.rate} royalty</span>
+                    </div>
+                    <div style={{fontSize:12,fontWeight:700,color:"#111827",minWidth:36,textAlign:"right"}}>{w.earned}</div>
+                  </>
+                : <span style={{fontSize:10,fontWeight:500,color:"#a06010",backgroundColor:"#fef9ed",borderRadius:7,padding:"3px 8px"}}>Pending</span>
+              }
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+}
+
 function AccountOverview() {
   return (
     <section className="mb-7">
-      <SectionHeader title="Account Overview" subtitle="A snapshot of your registered works, rules, and latest earnings." />
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <SectionHeader title="Account Overview" subtitle="Your works and royalty status at a glance." />
+      <div style={{display:"grid",gridTemplateColumns:"repeat(2, 1fr)",gap:12}}>
+        <WorksRoyaltyCard />
         {STATS.map((s,i) => {
           const Icon = s.icon;
           return (
@@ -197,7 +306,6 @@ function AccountOverview() {
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{backgroundColor:s.ib}}>
                   <Icon size={15} style={{color:s.ic}}/>
                 </div>
-                <ArrowUpRight size={12} className="text-gray-200"/>
               </div>
               <div className="text-xl font-bold text-gray-900 leading-none">{s.value}</div>
               <div className="text-xs font-medium text-gray-700 mt-1.5">{s.label}</div>
@@ -273,23 +381,60 @@ function MyWorks() {
 }
 
 /* ── Royalty Rules ──────────────────────────────────────────────────────── */
+const RULE_PLAIN = {
+  1: {
+    summary: "For every $100 Resonance Vol. 1 earns from streams, downloads, or licensing — you get $12.",
+    netRevenue: "The money a platform collects from your music, minus their operating costs (like payment processing fees). You get your cut from what's left.",
+    approval: "The platform reviewed your royalty terms and agreed to them. This is their formal 'yes'.",
+    published: "Your royalty rate is now visible to anyone who wants to license or use this work. It's live.",
+  },
+  2: {
+    summary: "For every $100 The Quiet Hours EP earns from streams, downloads, or licensing — you get $10.",
+    netRevenue: "The money a platform collects from your music, minus their operating costs. You get your cut from what's left.",
+    approval: "The platform reviewed your royalty terms and agreed to them.",
+    published: "Your royalty rate is now live and visible to potential licensees.",
+  },
+  3: {
+    summary: "When Visual Essay: Urban Drift gets approved, you'll earn $15 for every $100 it generates.",
+    netRevenue: "Revenue after the platform deducts their costs. Your percentage applies to this amount.",
+    approval: "Still waiting for the platform to review and confirm your royalty terms.",
+    published: "Not yet — this will go live once approval is granted.",
+  },
+};
+
 function RoyaltyRules() {
+  const plain = usePlain();
   const [selected, setSelected] = useState(null);
+  const rp = selected ? RULE_PLAIN[selected.id] : null;
   return (
     <section className="mb-7">
-      <SectionHeader title="Royalty Rules" subtitle="These rules define how royalty is calculated for each of your works." />
+      <SectionHeader title="Royalty Rules" subtitle={plain ? "How much you earn from each work, in plain terms." : "These rules define how royalty is calculated for each of your works."} />
       <Card>
         <div className="divide-y divide-gray-50">
           {RULES.map(r => (
             <div key={r.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-gray-900">{r.work}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{r.rate}</div>
+                {plain ? (
+                  <div className="text-xs text-gray-600 mt-0.5 leading-relaxed">{RULE_PLAIN[r.id].summary}</div>
+                ) : (
+                  <div className="text-xs text-gray-500 mt-0.5">{r.rate}</div>
+                )}
                 {r.since !== "—" && <div className="text-xs text-gray-400 mt-0.5">In effect since {r.since}</div>}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <Chip type={r.approval}/>
-                <Chip type={r.published}/>
+                {plain ? (
+                  <>
+                    <span style={{fontSize:11,fontWeight:600,color:r.approval==="Approved"?"#1a7a50":"#a06010",backgroundColor:r.approval==="Approved"?"#edf7f3":"#fef9ed",borderRadius:9999,padding:"2px 10px"}}>
+                      {r.approval==="Approved" ? "✓ Approved" : "⏳ Awaiting approval"}
+                    </span>
+                    <span style={{fontSize:11,fontWeight:600,color:r.published==="Published"?"#1a7a50":"#9ca3af",backgroundColor:r.published==="Published"?"#edf7f3":"#f3f4f6",borderRadius:9999,padding:"2px 10px"}}>
+                      {r.published==="Published" ? "🌐 Live" : "Not live yet"}
+                    </span>
+                  </>
+                ) : (
+                  <><Chip type={r.approval}/><Chip type={r.published}/></>
+                )}
                 <button onClick={() => setSelected(r)} style={{color:A,background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600,marginLeft:4}}>View →</button>
               </div>
             </div>
@@ -298,29 +443,63 @@ function RoyaltyRules() {
       </Card>
       {selected && (
         <div onClick={() => setSelected(null)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:50,display:"flex",alignItems:"center",justifyContent:"center",backgroundColor:"rgba(0,0,0,0.28)",backdropFilter:"blur(4px)"}}>
-          <div onClick={e=>e.stopPropagation()} style={{backgroundColor:"white",width:"calc(100% - 32px)",maxWidth:420,borderRadius:24,padding:24,boxShadow:"0 25px 50px -12px rgba(0,0,0,0.25)"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+          <div onClick={e=>e.stopPropagation()} style={{backgroundColor:"white",width:"calc(100% - 32px)",maxWidth:440,borderRadius:24,padding:24,boxShadow:"0 25px 50px -12px rgba(0,0,0,0.25)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
               <div style={{display:"flex",alignItems:"center",gap:10}}>
                 <div style={{width:36,height:36,borderRadius:12,backgroundColor:"#edf7f3",display:"flex",alignItems:"center",justifyContent:"center"}}>
                   <Shield size={16} style={{color:"#1a7a50"}}/>
                 </div>
-                <h3 style={{fontSize:14,fontWeight:700,color:"#111827",margin:0}}>Royalty Rule</h3>
+                <div>
+                  <h3 style={{fontSize:14,fontWeight:700,color:"#111827",margin:0}}>Royalty Rule</h3>
+                  <div style={{fontSize:11,color:"#9ca3af"}}>{selected.work}</div>
+                </div>
               </div>
               <button onClick={() => setSelected(null)} style={{width:26,height:26,borderRadius:"50%",backgroundColor:"#f3f4f6",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIco size={13}/></button>
             </div>
+
+            {/* Plain English summary banner */}
+            {plain && rp && (
+              <div style={{backgroundColor:"#f0e8fa",borderRadius:12,padding:"10px 12px",marginBottom:12,border:"1px solid #d4a8e0"}}>
+                <div style={{fontSize:10,fontWeight:700,color:A,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:3}}>💬 What this means for you</div>
+                <div style={{fontSize:12,color:"#3d0060",lineHeight:1.5}}>{rp.summary}</div>
+              </div>
+            )}
+
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              {[["Work",selected.work,false],["Royalty Rate",selected.rate,false],["In Effect Since",selected.since,false]].map(([k,v]) => (
-                <div key={k} style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
-                  <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{k}</div>
-                  <div style={{fontSize:13,fontWeight:500,color:"#111827"}}>{v}</div>
+              {/* Rate */}
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
+                <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{plain ? "Your cut" : "Royalty Rate"}</div>
+                <div style={{fontSize:16,fontWeight:800,color:"#111827"}}>{selected.rate.split(" ")[0]}</div>
+                {plain ? (
+                  <div style={{fontSize:11,color:"#6b7280",marginTop:3}}>
+                    of <JTip term="Net Usage Revenue" plain={rp?.netRevenue}>net usage revenue</JTip> — the money left after the platform takes their share
+                  </div>
+                ) : (
+                  <div style={{fontSize:11,color:"#6b7280",marginTop:2}}>{selected.rate}</div>
+                )}
+              </div>
+
+              {/* In effect */}
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
+                <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{plain ? "Started earning from" : "In Effect Since"}</div>
+                <div style={{fontSize:13,fontWeight:500,color:"#111827"}}>{selected.since}</div>
+              </div>
+
+              {/* Approval */}
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa",display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{plain ? "Platform agreement" : "Approval Status"}</div>
+                  {plain && rp && <div style={{fontSize:11,color:"#6b7280",lineHeight:1.4}}>{rp.approval}</div>}
                 </div>
-              ))}
-              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                <div style={{fontSize:11,color:"#9ca3af"}}>Approval Status</div>
                 <Chip type={selected.approval}/>
               </div>
-              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                <div style={{fontSize:11,color:"#9ca3af"}}>Published Status</div>
+
+              {/* Published */}
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa",display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:8}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{plain ? "Visibility" : "Published Status"}</div>
+                  {plain && rp && <div style={{fontSize:11,color:"#6b7280",lineHeight:1.4}}>{rp.published}</div>}
+                </div>
                 <Chip type={selected.published}/>
               </div>
             </div>
@@ -333,10 +512,19 @@ function RoyaltyRules() {
 }
 
 /* ── Payment Progress ───────────────────────────────────────────────────── */
+const STEPS_PLAIN = [
+  { label:"You & the platform agreed on your cut",  desc:"Your royalty rate was confirmed"      },
+  { label:"Revenue was collected",                  desc:"The platform gathered usage fees"     },
+  { label:"Your streams were counted",              desc:"Plays and downloads were logged"       },
+  { label:"Money was sent to you",                  desc:"Payout transferred to your account"   },
+  { label:"A permanent receipt is being saved",     desc:"Unchangeable record being finalized"  },
+];
+
 function PaymentProgress() {
+  const plain = usePlain();
   return (
     <section className="mb-7">
-      <SectionHeader title="Payment Progress" subtitle="Track where your latest royalty payment stands right now." />
+      <SectionHeader title="Payment Progress" subtitle={plain ? "Where your money is right now, step by step." : "Track where your latest royalty payment stands right now."} />
       <Card className="p-5 sm:p-6">
         <div className="flex items-center gap-2 mb-5">
           <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Resonance Vol. 1</span>
@@ -344,14 +532,16 @@ function PaymentProgress() {
           <span className="text-xs text-gray-400">April 2025 cycle</span>
           <span className="ml-auto text-xs font-medium"
             style={{backgroundColor:"#edf7f3",color:"#1a7a50",padding:"2px 10px",borderRadius:9999}}>
-            4 of 5 complete
+            {plain ? "Step 4 of 5 done ✓" : "4 of 5 complete"}
           </span>
         </div>
         {/* Desktop stepper */}
         <div className="hidden md:flex items-start relative">
           <div className="absolute h-px bg-gray-100" style={{top:20,left:20,right:20}}/>
           <div className="absolute h-px bg-green-400" style={{top:20,left:20,width:"calc(75% - 12px)"}}/>
-          {STEPS.map(step => (
+          {STEPS.map((step,i) => {
+            const ps = STEPS_PLAIN[i];
+            return (
             <div key={step.id} className="flex flex-col items-center flex-1 px-1" style={{zIndex:10}}>
               <div className="w-10 h-10 rounded-full flex items-center justify-center border-2 mb-2.5"
                 style={{backgroundColor:step.done?"#22c55e":"white",borderColor:step.done?"#22c55e":"#e5e7eb"}}>
@@ -359,15 +549,18 @@ function PaymentProgress() {
                   ? <CheckCircle size={17} style={{color:"white"}}/>
                   : <Clock size={14} style={{color:"#d1d5db"}}/>}
               </div>
-              <div className="text-center" style={{fontSize:11,fontWeight:600,color:"#1f2937",lineHeight:"1.3"}}>{step.label}</div>
-              <div className="text-center mt-0.5" style={{fontSize:10,color:"#9ca3af",lineHeight:"1.4"}}>{step.desc}</div>
+              <div className="text-center" style={{fontSize:11,fontWeight:600,color:"#1f2937",lineHeight:"1.3"}}>{plain ? ps.label : step.label}</div>
+              <div className="text-center mt-0.5" style={{fontSize:10,color:"#9ca3af",lineHeight:"1.4"}}>{plain ? ps.desc : step.desc}</div>
               {step.date && <div className="mt-1" style={{fontSize:10,color:"#d1d5db"}}>{step.date}</div>}
             </div>
-          ))}
+            );
+          })}
         </div>
         {/* Mobile stepper */}
         <div className="md:hidden">
-          {STEPS.map((step,i) => (
+          {STEPS.map((step,i) => {
+            const ps = STEPS_PLAIN[i];
+            return (
             <div key={step.id} className="flex gap-3">
               <div className="flex flex-col items-center">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center border-2 flex-shrink-0"
@@ -381,12 +574,13 @@ function PaymentProgress() {
                 )}
               </div>
               <div className="pb-4 pt-1 min-w-0">
-                <div className="text-sm font-semibold text-gray-800">{step.label}</div>
-                <div className="text-xs text-gray-400">{step.desc}</div>
+                <div className="text-sm font-semibold text-gray-800">{plain ? ps.label : step.label}</div>
+                <div className="text-xs text-gray-400">{plain ? ps.desc : step.desc}</div>
                 {step.date && <div className="text-xs text-gray-300 mt-0.5">{step.date}</div>}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </Card>
     </section>
@@ -395,16 +589,30 @@ function PaymentProgress() {
 
 /* ── Payment History ────────────────────────────────────────────────────── */
 function PaymentHistory() {
+  const plain = usePlain();
   const [selected, setSelected] = useState(null);
+
+  // Plain-language math breakdown per history item
+  const calcBreakdown = (p) => {
+    const rateMap = {"Resonance Vol. 1":0.12,"The Quiet Hours EP":0.10};
+    const rate = rateMap[p.work] || 0.12;
+    const amount = parseFloat(p.amount.replace("$","").replace(",",""));
+    const gross = (amount / rate).toFixed(0);
+    return { rate: (rate*100)+"%" , gross: "$"+parseInt(gross).toLocaleString(), net: p.amount };
+  };
+
   return (
     <section className="mb-7">
-      <SectionHeader title="Payment History" subtitle="All royalty payments received for your registered works." />
+      <SectionHeader title="Payment History" subtitle={plain ? "A record of every payout you've received, with the math explained." : "All royalty payments received for your registered works."} />
       {/* Desktop table */}
       <Card className="hidden md:block overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-50">
-              {["Date","Work","Usage","Received","Status",""].map((h,i) => (
+              {(plain
+                ? ["When","Work","Times used","You got","Status",""]
+                : ["Date","Work","Usage","Received","Status",""]
+              ).map((h,i) => (
                 <th key={i} className={`px-5 py-3 text-xs font-medium text-gray-400 uppercase tracking-wide ${i===5?"":"text-left"}`}>{h}</th>
               ))}
             </tr>
@@ -415,10 +623,13 @@ function PaymentHistory() {
                 <td className="px-5 py-3.5 text-sm text-gray-400">{p.date}</td>
                 <td className="px-5 py-3.5 text-sm font-medium text-gray-900">{p.work}</td>
                 <td className="px-5 py-3.5 text-sm text-gray-500">{p.usage}</td>
-                <td className="px-5 py-3.5 text-sm font-semibold text-gray-900">{p.amount}</td>
+                <td className="px-5 py-3.5">
+                  <div className="text-sm font-semibold text-gray-900">{p.amount}</div>
+                  {plain && <div className="text-xs text-gray-400 mt-0.5">{calcBreakdown(p).rate} of net revenue</div>}
+                </td>
                 <td className="px-5 py-3.5"><Chip type={p.status}/></td>
                 <td className="px-5 py-3.5 text-right">
-                  <button onClick={() => setSelected(p)} style={{color:A,background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600}}>View details</button>
+                  <button onClick={() => setSelected(p)} style={{color:A,background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600}}>{plain?"Explain →":"View details"}</button>
                 </td>
               </tr>
             ))}
@@ -436,59 +647,149 @@ function PaymentHistory() {
             <div className="text-xs text-gray-400 mb-3">{p.date}</div>
             <div className="flex items-end justify-between">
               <div>
-                <div className="text-xs text-gray-400">Usage</div>
+                <div className="text-xs text-gray-400">{plain?"Times used":"Usage"}</div>
                 <div className="text-sm text-gray-700 mt-0.5">{p.usage}</div>
               </div>
               <div>
-                <div className="text-xs text-gray-400">Received</div>
+                <div className="text-xs text-gray-400">{plain?"You got":"Received"}</div>
                 <div className="text-sm font-bold text-gray-900 mt-0.5">{p.amount}</div>
+                {plain && <div className="text-xs text-gray-400">{calcBreakdown(p).rate} royalty</div>}
               </div>
-              <button onClick={() => setSelected(p)} style={{color:A,background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600}}>View →</button>
+              <button onClick={() => setSelected(p)} style={{color:A,background:"none",border:"none",cursor:"pointer",fontSize:12,fontWeight:600}}>{plain?"Explain →":"View →"}</button>
             </div>
           </Card>
         ))}
       </div>
-      {selected && (
+      {selected && (() => {
+        const bd = calcBreakdown(selected);
+        return (
         <div onClick={() => setSelected(null)} style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:50,display:"flex",alignItems:"center",justifyContent:"center",backgroundColor:"rgba(0,0,0,0.28)",backdropFilter:"blur(4px)"}}>
           <div onClick={e=>e.stopPropagation()} style={{backgroundColor:"white",width:"calc(100% - 32px)",maxWidth:420,borderRadius:24,padding:24,boxShadow:"0 25px 50px -12px rgba(0,0,0,0.25)"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
               <div style={{display:"flex",alignItems:"center",gap:10}}>
                 <div style={{width:36,height:36,borderRadius:12,backgroundColor:"#edf7f3",display:"flex",alignItems:"center",justifyContent:"center"}}>
                   <DollarSign size={16} style={{color:"#1a7a50"}}/>
                 </div>
-                <h3 style={{fontSize:14,fontWeight:700,color:"#111827",margin:0}}>Payment Details</h3>
+                <h3 style={{fontSize:14,fontWeight:700,color:"#111827",margin:0}}>{plain ? "How this payout was calculated" : "Payment Details"}</h3>
               </div>
               <button onClick={() => setSelected(null)} style={{width:26,height:26,borderRadius:"50%",backgroundColor:"#f3f4f6",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIco size={13}/></button>
             </div>
+
+            {plain && (
+              <div style={{backgroundColor:"#f0e8fa",borderRadius:12,padding:"12px 14px",marginBottom:12,border:"1px solid #d4a8e0"}}>
+                <div style={{fontSize:10,fontWeight:700,color:A,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:6}}>💬 The math, explained</div>
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontSize:12,color:"#6b7280"}}>Platform earned from your music</span>
+                    <span style={{fontSize:12,fontWeight:600,color:"#374151"}}>{bd.gross}</span>
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontSize:12,color:"#6b7280"}}>Your royalty rate</span>
+                    <span style={{fontSize:12,fontWeight:600,color:"#374151"}}>{bd.rate}</span>
+                  </div>
+                  <div style={{height:1,backgroundColor:"#d4a8e0"}}/>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontSize:13,fontWeight:700,color:"#3d0060"}}>You received</span>
+                    <span style={{fontSize:16,fontWeight:800,color:"#3d0060"}}>{bd.net}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              {[["Date",selected.date],["Work",selected.work],["Usage",selected.usage],["Amount Received",selected.amount]].map(([k,v]) => (
+              {[
+                [plain?"When":"Date", selected.date],
+                [plain?"Work":"Work", selected.work],
+                [plain?"How many times it was used":"Usage", selected.usage],
+                [plain?"Money you received":"Amount Received", selected.amount],
+              ].map(([k,v]) => (
                 <div key={k} style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
                   <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{k}</div>
                   <div style={{fontSize:13,fontWeight:500,color:"#111827"}}>{v}</div>
                 </div>
               ))}
               <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-                <div style={{fontSize:11,color:"#9ca3af"}}>Status</div>
+                <div style={{fontSize:11,color:"#9ca3af"}}>{plain?"Was it paid?":"Status"}</div>
                 <Chip type={selected.status}/>
               </div>
             </div>
             <button onClick={() => setSelected(null)} style={{marginTop:16,width:"100%",padding:"11px 0",borderRadius:12,backgroundColor:A,color:"white",fontSize:13,fontWeight:600,border:"none",cursor:"pointer"}}>Close</button>
           </div>
         </div>
-      )}
+        );
+      })()}
     </section>
   );
 }
 
+/* ── Usage Verification Notice ──────────────────────────────────────────── */
+function UsageVerificationNotice() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div style={{borderRadius:14,border:"1px solid #f5d3a0",backgroundColor:"#fffbf2",padding:"12px 14px",marginBottom:16}}>
+      <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
+        <div style={{width:30,height:30,borderRadius:9,backgroundColor:"#fef3c7",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>
+          <AlertTriangle size={14} style={{color:"#d97706"}}/>
+        </div>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:12,fontWeight:700,color:"#92400e",marginBottom:2}}>Heads up: Usage data comes from platforms — not verified yet</div>
+          <div style={{fontSize:11,color:"#b45309",lineHeight:1.5}}>
+            The workflow starts from <strong>Music Use</strong> reported by streaming platforms. Before this enters settlement, you can't automatically confirm the accuracy of their usage counts.
+          </div>
+          {expanded && (
+            <div style={{marginTop:10,paddingTop:10,borderTop:"1px solid #f5d3a0"}}>
+              <div style={{fontSize:11,color:"#78350f",lineHeight:1.6}}>
+                <strong style={{display:"block",marginBottom:4}}>What you can do to verify:</strong>
+                <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                  {[
+                    ["Cross-check your distributor dashboard","Compare Resonance Vol. 1 stream counts on your distributor (e.g. DistroKid, TuneCore) against what's reported here."],
+                    ["Request a usage report","Most platforms offer downloadable CSV usage reports. Match stream counts and territories period-by-period."],
+                    ["Flag discrepancies before settlement","If numbers don't add up, raise a dispute with the platform before the billing cycle closes — post-settlement corrections are rare."],
+                  ].map(([title, desc], i) => (
+                    <div key={i} style={{display:"flex",gap:7,alignItems:"flex-start"}}>
+                      <div style={{width:16,height:16,borderRadius:"50%",backgroundColor:"#fde68a",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:9,fontWeight:700,color:"#92400e",marginTop:1}}>{i+1}</div>
+                      <div><span style={{fontWeight:600}}>{title}:</span> {desc}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          <button onClick={() => setExpanded(v=>!v)} style={{marginTop:8,fontSize:11,fontWeight:600,color:"#d97706",background:"none",border:"none",cursor:"pointer",padding:0}}>
+            {expanded ? "Show less ↑" : "How to verify usage accuracy →"}
+          </button>
+        </div>
+        <div style={{flexShrink:0,display:"flex",alignItems:"center",gap:4,backgroundColor:"#fde68a",borderRadius:8,padding:"3px 8px"}}>
+          <Eye size={10} style={{color:"#92400e"}}/>
+          <span style={{fontSize:10,fontWeight:700,color:"#92400e"}}>Review</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Payment Proof ──────────────────────────────────────────────────────── */
+const PROOF_PLAIN = {
+  "Rule Approved":     { label:"You and the platform agreed on your cut",    desc:"Your royalty rate was locked in and both sides confirmed it in writing (digitally)." },
+  "Usage Recorded":    { label:"They counted how many times your work was used", desc:"The platform logged every stream, download, or play of your music in this billing period." },
+  "Payment Completed": { label:"Money landed in your account",               desc:"The calculated royalty amount was transferred to you. This is the actual payout." },
+  "Proof Stored":      { label:"A permanent record is being created",        desc:"An unchangeable digital receipt is being saved so you always have proof this happened." },
+};
+
 function PaymentProof() {
+  const plain = usePlain();
   const [modal, setModal] = useState(null);
   return (
     <section className="mb-7">
       <SectionHeader title="Payment Proof"
-        subtitle="Verified records for each stage of your royalty settlement. Click 'Details' to view technical information." />
+        subtitle={plain
+          ? "A receipts trail showing every step of your royalty payment — in plain terms."
+          : "Verified records for each stage of your royalty settlement. Click 'Details' to view technical information."} />
+      <UsageVerificationNotice />
       <div className="space-y-2.5">
-        {PROOF.map(item => (
+        {PROOF.map(item => {
+          const pp = PROOF_PLAIN[item.label];
+          return (
           <Card key={item.id} className="p-4">
             <div className="flex items-start sm:items-center justify-between gap-3">
               <div className="flex items-start sm:items-center gap-3">
@@ -499,8 +800,8 @@ function PaymentProof() {
                     : <Clock size={16} style={{color:A}}/>}
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-gray-900">{item.label}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{item.desc}</div>
+                  <div className="text-sm font-semibold text-gray-900">{plain && pp ? pp.label : item.label}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{plain && pp ? pp.desc : item.desc}</div>
                   <div className="text-xs text-gray-300 mt-0.5">{item.date}</div>
                 </div>
               </div>
@@ -510,13 +811,14 @@ function PaymentProof() {
                   <button
                     style={{color:A,borderColor:AM,backgroundColor:AL,padding:"5px 12px",borderRadius:8,border:`1px solid ${AM}`,fontSize:12,fontWeight:600,cursor:"pointer"}}
                     onClick={() => setModal(item)}>
-                    Details
+                    {plain ? "Receipt" : "Details"}
                   </button>
                 )}
               </div>
             </div>
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       {/* Modal */}
@@ -525,23 +827,53 @@ function PaymentProof() {
           style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:50,display:"flex",alignItems:"center",justifyContent:"center",backgroundColor:"rgba(0,0,0,0.28)",backdropFilter:"blur(4px)"}}>
           <div onClick={e => e.stopPropagation()}
             style={{backgroundColor:"white",width:"calc(100% - 32px)",maxWidth:448,borderRadius:24,padding:24,boxShadow:"0 25px 50px -12px rgba(0,0,0,0.25)"}}>
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-sm font-semibold text-gray-900">Technical Details</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-gray-900">{plain ? "Payment Receipt" : "Technical Details"}</h3>
               <button onClick={() => setModal(null)}
                 style={{width:24,height:24,borderRadius:"50%",backgroundColor:"#f3f4f6",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
                 <XIco size={13}/>
               </button>
             </div>
+
+            {plain && PROOF_PLAIN[modal.label] && (
+              <div style={{backgroundColor:"#f0e8fa",borderRadius:12,padding:"10px 12px",marginBottom:12,border:"1px solid #d4a8e0"}}>
+                <div style={{fontSize:10,fontWeight:700,color:A,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:3}}>💬 In plain terms</div>
+                <div style={{fontSize:12,color:"#3d0060",lineHeight:1.5}}>{PROOF_PLAIN[modal.label].desc}</div>
+              </div>
+            )}
+
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
-              {[["Event",modal.label,false],["Date recorded",modal.date,false],["Transaction reference",modal.tx,true],["Storage type","Distributed ledger · Immutable",false]].map(([k,v,mono]) => (
-                <div key={k} style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
-                  <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{k}</div>
-                  <div style={{fontSize:13,fontWeight:500,color:"#111827",fontFamily:mono?"monospace":"inherit"}}>{v}</div>
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
+                <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{plain ? "What happened" : "Event"}</div>
+                <div style={{fontSize:13,fontWeight:500,color:"#111827"}}>{plain && PROOF_PLAIN[modal.label] ? PROOF_PLAIN[modal.label].label : modal.label}</div>
+              </div>
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
+                <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>{plain ? "When" : "Date recorded"}</div>
+                <div style={{fontSize:13,fontWeight:500,color:"#111827"}}>{modal.date}</div>
+              </div>
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
+                <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>
+                  {plain
+                    ? <span>Receipt ID <JTip term="Transaction Reference" plain="A unique code that permanently identifies this event on a distributed ledger — like a bank transfer reference, but impossible to fake or alter.">(what's this?)</JTip></span>
+                    : "Transaction reference"}
                 </div>
-              ))}
+                <div style={{fontSize:13,fontWeight:500,color:"#111827",fontFamily:"monospace"}}>{modal.tx}</div>
+              </div>
+              <div style={{padding:12,borderRadius:12,backgroundColor:"#f9f8fa"}}>
+                <div style={{fontSize:11,color:"#9ca3af",marginBottom:4}}>
+                  {plain
+                    ? <span>How it's stored <JTip term="Distributed Ledger" plain="Think of it like a Google Doc that thousands of computers share simultaneously — no one person can edit or delete it. Your record is permanent.">ⓘ</JTip></span>
+                    : "Storage type"}
+                </div>
+                <div style={{fontSize:13,fontWeight:500,color:"#111827"}}>
+                  {plain
+                    ? "Permanent digital record — can't be edited or deleted"
+                    : "Distributed ledger · Immutable"}
+                </div>
+              </div>
             </div>
             <button onClick={() => window.open("https://explorer.example.com/tx/"+modal.tx, "_blank")} style={{marginTop:16,width:"100%",padding:"11px 0",borderRadius:12,backgroundColor:A,color:"white",fontSize:13,fontWeight:600,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-              <ExternalLink size={13}/> View on explorer
+              <ExternalLink size={13}/> {plain ? "View permanent receipt" : "View on explorer"}
             </button>
           </div>
         </div>
@@ -650,7 +982,7 @@ function BottomNav({ active, set }) {
   );
 }
 
-function TopHeader({ active }) {
+function TopHeader({ active, plain, setPlain }) {
   const [showNotif, setShowNotif] = useState(false);
   const subs = {
     overview:"Registered works and royalty status",
@@ -669,6 +1001,16 @@ function TopHeader({ active }) {
         <div className="text-xs text-gray-400 hidden sm:block mt-0.5">{subs[active]}</div>
       </div>
       <div className="flex items-center gap-2" style={{position:"relative"}}>
+        {/* Plain English Toggle */}
+        <button
+          onClick={() => setPlain(v=>!v)}
+          title={plain ? "Switch to technical view" : "Switch to Plain English"}
+          style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",borderRadius:10,border:`1px solid ${plain?"#a038b2":"#e5e7eb"}`,backgroundColor:plain?AL:"#f9fafb",cursor:"pointer",transition:"all 0.15s"}}>
+          <MessageSquare size={12} style={{color:plain?A:"#9ca3af"}}/>
+          <span style={{fontSize:11,fontWeight:600,color:plain?A:"#9ca3af",whiteSpace:"nowrap"}}>
+            {plain ? "Plain English ON" : "Plain English"}
+          </span>
+        </button>
         <button onClick={() => setShowNotif(v=>!v)} style={{width:28,height:28,borderRadius:10,backgroundColor:showNotif?AL:"#f9fafb",border:showNotif?`1px solid ${AM}`:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
           <Bell size={14} style={{color:showNotif?A:"#9ca3af"}}/>
           <span style={{position:"absolute",top:4,right:4,width:6,height:6,borderRadius:"50%",backgroundColor:A,border:"2px solid white"}}/>
@@ -710,11 +1052,21 @@ function TopHeader({ active }) {
 /* ── App ────────────────────────────────────────────────────────────────── */
 function App() {
   const [tab, setTab] = useState("overview");
+  const [plain, setPlain] = useState(false);
   return (
+    <PlainCtx.Provider value={plain}>
     <div style={{display:"flex",minHeight:"100vh",backgroundColor:"#f5f3f8"}}>
       <Sidebar active={tab} set={setTab}/>
       <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
-        <TopHeader active={tab}/>
+        <TopHeader active={tab} plain={plain} setPlain={setPlain}/>
+        {plain && (
+          <div style={{backgroundColor:"#f0e8fa",borderBottom:"1px solid #d4a8e0",padding:"8px 20px",display:"flex",alignItems:"center",gap:8}}>
+            <MessageSquare size={12} style={{color:A,flexShrink:0}}/>
+            <span style={{fontSize:11,color:"#5a1a7a",lineHeight:1.4}}>
+              <strong>Plain English mode is on.</strong> Legal and financial terms are translated into everyday language throughout this dashboard. Tap any <span style={{borderBottom:"1px dashed #a038b2",color:"#7420a0",fontWeight:600}}>underlined term</span> for more detail.
+            </span>
+          </div>
+        )}
         <main style={{flex:1,padding:"16px 16px 96px",overflowY:"auto"}}>
           <div style={{maxWidth:900,margin:"0 auto"}}>
             {tab==="overview" && <><HeroBanner setTab={setTab}/><AccountOverview/><MyWorks/><RoyaltyRules/></>}
@@ -725,6 +1077,7 @@ function App() {
       </div>
       <BottomNav active={tab} set={setTab}/>
     </div>
+    </PlainCtx.Provider>
   );
 }
 
