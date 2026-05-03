@@ -5,7 +5,7 @@
     { "source": "/admin", "destination": "/admin/index.html" },
     { "source": "/auditor", "destination": "/auditor/index.html" },
     { "source": "/validator", "destination": "/validator/index.html" },
-    { "source": "/DSP", "destination": "/DSP/index.html" },
+    { "source": "/dsp", "destination": "/DSP/index.html" },
     { "source": "/dashboard", "destination": "/dashboard/index.html" }
   ]
 }
